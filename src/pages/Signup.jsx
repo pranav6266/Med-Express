@@ -1,3 +1,5 @@
+// src/pages/Signup.jsx
+
 import { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -9,13 +11,13 @@ function Signup() {
         email: '',
         password: '',
         confirmPassword: '',
-        role: 'user',
+        role: '', // Role is now selected by the user
     });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
 
     const handleSignUp = async (e) => {
-        e.preventDefault(); // Prevent page reload on form submission
+        e.preventDefault();
         setError('');
         if (form.password !== form.confirmPassword) {
             setError('Passwords do not match');
@@ -35,21 +37,26 @@ function Signup() {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
+    const handleRoleSelect = (selectedRole) => {
+        setForm({ ...form, role: selectedRole });
+        nextStep(); // Automatically move to the next step after role selection
+    };
+
     const nextStep = () => setStep(step + 1);
     const prevStep = () => setStep(step - 1);
 
+    // Added 'role' as the first step
     const steps = [
+        { name: 'role', type: 'selection', label: 'I want to sign up as a...' },
         { name: 'name', type: 'text', label: 'Name' },
         { name: 'email', type: 'email', label: 'Email' },
         { name: 'password', type: 'password', label: 'Password' },
         { name: 'confirmPassword', type: 'password', label: 'Confirm Password' },
     ];
 
-    // New function to handle the 'Enter' key press
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            // Check if the current step's input is filled before going to the next
             if (form[steps[step].name]) {
                 nextStep();
             }
@@ -78,24 +85,34 @@ function Signup() {
                     <div className="form-content">
                         <div className="form-step">
                             <label>{steps[step].label}</label>
-                            <input
-                                type={steps[step].type}
-                                name={steps[step].name}
-                                placeholder={`Enter your ${steps[step].name.replace('Password', ' password')}`}
-                                value={form[steps[step].name]}
-                                onChange={handleChange}
-                                // Add the handler only to steps that have a 'Next' button
-                                onKeyDown={step < steps.length - 1 ? handleKeyDown : undefined}
-                                autoFocus
-                            />
+                            {/* Conditional rendering for the role selection step */}
+                            {steps[step].type === 'selection' ? (
+                                <div className="button-group" style={{ marginTop: '1rem' }}>
+                                    <button type="button" onClick={() => handleRoleSelect('user')}>User</button>
+                                    <button type="button" onClick={() => handleRoleSelect('agent')}>Delivery Agent</button>
+                                </div>
+                            ) : (
+                                <input
+                                    type={steps[step].type}
+                                    name={steps[step].name}
+                                    placeholder={`Enter your ${steps[step].name.replace('Password', ' password')}`}
+                                    value={form[steps[step].name]}
+                                    onChange={handleChange}
+                                    onKeyDown={step < steps.length - 1 ? handleKeyDown : undefined}
+                                    autoFocus
+                                />
+                            )}
                         </div>
                     </div>
 
                     <div className="button-group">
                         {step > 0 && <button type="button" onClick={prevStep}>Back</button>}
-                        {step < steps.length - 1 ? (
+                        {/* Hide 'Next' button on role selection, show on other steps */}
+                        {step > 0 && step < steps.length - 1 && (
                             <button type="button" onClick={nextStep} disabled={!form[steps[step].name]}>Next</button>
-                        ) : (
+                        )}
+                        {/* Show 'Finish' button only on the last step */}
+                        {step === steps.length - 1 && (
                             <button type="submit" disabled={!form.password || !form.confirmPassword}>Finish</button>
                         )}
                     </div>

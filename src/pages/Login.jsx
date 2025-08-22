@@ -1,25 +1,41 @@
+// src/pages/Login.jsx
+
 import { useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Login() {
     const [step, setStep] = useState(0);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState(false);
+
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
-        // Prevent default form submission which reloads the page
         e.preventDefault();
-
         setError('');
-        if (!password) return; // Don't submit if password is empty
+        if (!password) return;
+
         try {
             const { data } = await axios.post('/api/auth/login', { email, password });
-            console.log('Login successful:', data);
             localStorage.setItem('userInfo', JSON.stringify(data));
-            setSuccess(true);
+
+            // --- Role-Based Redirection ---
+            switch (data.role) {
+                case 'user':
+                    navigate('/dashboard');
+                    break;
+                case 'agent':
+                    navigate('/agent/dashboard');
+                    break;
+                case 'admin':
+                    navigate('/admin/dashboard'); // Navigate admin to their dashboard
+                    break;
+                default:
+                    navigate('/login');
+            }
+
         } catch (err) {
             const message = err.response?.data?.message || 'Login failed';
             setError(message);
@@ -29,26 +45,14 @@ function Login() {
     const nextStep = () => setStep(step + 1);
     const prevStep = () => setStep(step - 1);
 
-    // New function to handle the 'Enter' key press
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
-            e.preventDefault(); // Stop the form from submitting prematurely
-            if (email) { // Ensure the input has a value before proceeding
+            e.preventDefault();
+            if (email) {
                 nextStep();
             }
         }
     };
-
-    if (success) {
-        return (
-            <div className="form-container">
-                <div className="form-card">
-                    <h2>Login Successful!</h2>
-                    <p>Welcome back, {email}.</p>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="form-container">
@@ -64,8 +68,8 @@ function Login() {
                                     placeholder="Enter your email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    onKeyDown={handleKeyDown} // Add the event handler here
-                                    autoFocus // Automatically focus this input
+                                    onKeyDown={handleKeyDown}
+                                    autoFocus
                                 />
                             </div>
                         )}
