@@ -13,7 +13,6 @@ import OrderHistory from './pages/OrderHistory.jsx';
 import AgentDashboard from './pages/AgentDashboard.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
 import Checkout from './pages/Checkout.jsx';
-import ThemeToggle from './components/ThemeToggle';
 import ProtectedRoute from './components/ProtectedRoute';
 import AgentRoute from './components/AgentRoute';
 import AdminRoute from './components/AdminRoute';
@@ -44,7 +43,6 @@ function AppContent() {
     return (
         <>
             <div style={mainContentStyle}>
-                <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
                 {/* The <Routes> component now sits directly inside AppContent */}
                 <Routes>
                     {/* Public Routes */}

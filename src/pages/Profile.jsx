@@ -2,25 +2,25 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+// --- 1. IMPORT useNavigate ---
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-import ChangePasswordModal from '../components/profile/ChangePasswordModal'; // <-- Import the new modal
+import ChangePasswordModal from '../components/profile/ChangePasswordModal';
 
-// ... (avatarOptions and defaultAvatar constants are unchanged)
-const avatarOptions = [ '/avatars/1.png', '/avatars/2.png', '/avatars/3.png', '/avatars/4.png', '/avatars/5.png' ];
-const defaultAvatar = '/avatars/default_profile_hundred.png';
+const avatarOptions = [ '/avatars/1.png', '/avatars/2.png', '/avatars/3.png', '/avatars/4.png', '/avatars/5.png'];
+const defaultAvatar = '/avatars/default_profile_img.png';
 
 
 function Profile() {
-    // ... (formData, loading, message, showAvatarOptions states are unchanged)
+    // --- 2. INITIALIZE useNavigate ---
+    const navigate = useNavigate();
+
     const [formData, setFormData] = useState({ name: '', email: '', phone: '', avatar: '', address: { flatNo: '', road: '', locality: '', pincode: '' } });
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState('');
     const [showAvatarOptions, setShowAvatarOptions] = useState(false);
-
-    // --- NEW: State to control the password modal ---
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
-    // ... (useEffect, handleChange, handleAvatarSelect, handleRemoveAvatar are unchanged)
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -68,7 +68,6 @@ function Profile() {
         setShowAvatarOptions(false);
     };
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -87,19 +86,22 @@ function Profile() {
         }
     };
 
+    // --- 3. CREATE A HANDLER FOR THE CLOSE BUTTON ---
+    const handleClose = () => {
+        navigate(-1); // Navigates to the previous page in history
+    };
+
+
     if (loading) return <p>Loading profile...</p>;
 
     return (
         <div>
-            {/* --- Conditionally render the modal --- */}
             {isPasswordModalOpen && <ChangePasswordModal onClose={() => setIsPasswordModalOpen(false)} />}
 
             <Header />
             <div className="form-container">
                 <form onSubmit={handleSubmit} className="form-card" style={{ maxWidth: '800px' }}>
                     <h2>My Profile</h2>
-
-                    {/* ... (Avatar Section is unchanged) ... */}
                     <div style={styles.avatarSection}>
                         <p style={{ margin: 0, fontWeight: 'bold' }}>Profile Picture</p>
                         <img src={formData.avatar} alt="Current Avatar" style={styles.currentAvatar} onClick={() => setShowAvatarOptions(!showAvatarOptions)} />
@@ -113,8 +115,6 @@ function Profile() {
                             </div>
                         )}
                     </div>
-
-                    {/* ... (Personal Info and Address Sections are unchanged) ... */}
                     <div style={styles.sectionContainer}>
                         <h3 style={styles.sectionHeader}>Personal Information</h3>
                         <div style={styles.formGrid}>
@@ -135,14 +135,19 @@ function Profile() {
 
                     {message && <p style={{ textAlign: 'center', margin: '1rem 0' }}>{message}</p>}
 
-                    {/* --- NEW: Button to open the password modal --- */}
                     <button type="button" onClick={() => setIsPasswordModalOpen(true)} style={styles.changePasswordButton}>
                         Change Password
                     </button>
 
-                    <button type="submit" disabled={loading} style={{ width: '100%' }}>
-                        {loading ? 'Saving...' : 'Save Changes'}
-                    </button>
+                    {/* --- 4. ADD BUTTON GROUP FOR SAVE AND CLOSE --- */}
+                    <div style={styles.buttonGroup}>
+                        <button type="submit" disabled={loading} style={styles.saveButton}>
+                            {loading ? 'Saving...' : 'Save Changes'}
+                        </button>
+                        <button type="button" onClick={handleClose} style={styles.closeButton}>
+                            Close
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -150,7 +155,6 @@ function Profile() {
 }
 
 const styles = {
-    // ... (all other styles are unchanged)
     avatarSection: { textAlign: 'center', marginBottom: '2rem', position: 'relative' },
     currentAvatar: { width: '120px', height: '120px', borderRadius: '50%', border: '4px solid var(--primary-color)', objectFit: 'cover', cursor: 'pointer', marginTop: '0.5rem' },
     avatarMenu: { position: 'absolute', top: '160px', left: '50%', transform: 'translateX(-50%)', backgroundColor: 'var(--card-background)', border: '1px solid var(--card-border)', borderRadius: '8px', padding: '1rem', zIndex: 10, width: 'calc(100% - 2rem)', maxWidth: '400px', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' },
@@ -163,7 +167,6 @@ const styles = {
     formGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' },
     formGroup: { display: 'flex', flexDirection: 'column' },
     input: { padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--input-border)', backgroundColor: 'var(--input-background)', color: 'var(--text-color)', fontSize: '1rem', marginTop: '0.25rem' },
-    // --- NEW STYLE for the change password button ---
     changePasswordButton: {
         width: '100%',
         padding: '0.75rem',
@@ -172,6 +175,19 @@ const styles = {
         border: '1px solid var(--primary-color)',
         color: 'var(--primary-color)',
         cursor: 'pointer'
+    },
+    // --- 5. ADD NEW STYLES FOR THE BUTTON GROUP ---
+    buttonGroup: {
+        display: 'flex',
+        gap: '1rem',
+        width: '100%'
+    },
+    saveButton: {
+        flex: 1 // Allows the button to grow and fill available space
+    },
+    closeButton: {
+        flex: 1,
+        backgroundColor: '#6c757d' // A neutral, secondary color
     }
 };
 

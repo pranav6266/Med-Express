@@ -22,7 +22,7 @@ function Dashboard() {
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [activeCategory, setActiveCategory] = useState('All');
-    const [hoveredCard, setHoveredCard] = useState(null); // State to track hovered card
+    const [hoveredCard, setHoveredCard] = useState(null);
     const { addToCart, selectedStore, setSelectedStore } = useCart();
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
@@ -81,7 +81,6 @@ function Dashboard() {
         setFilteredMedicines(medicinesToFilter);
     }, [searchTerm, activeCategory, allMedicines]);
 
-
     const handleAddToCart = (med) => {
         if (med.stock > 0) {
             addToCart(med._id, 1);
@@ -100,7 +99,8 @@ function Dashboard() {
                 </div>
 
                 {!selectedStore ? (
-                    <div style={styles.storeSelectorPrompt}>
+                    // --- APPLY ANIMATION STYLE HERE ---
+                    <div style={{...styles.storeSelectorPrompt, ...styles.contentFadeIn}}>
                         <h2>Select a Pharmacy to Start Shopping</h2>
                         <select onChange={(e) => setSelectedStore(e.target.value)} defaultValue="" style={styles.storeSelector}>
                             <option value="" disabled>-- Click to choose a nearby pharmacy --</option>
@@ -112,20 +112,21 @@ function Dashboard() {
                         </select>
                     </div>
                 ) : (
-                    <div>
+                    // --- AND APPLY ANIMATION STYLE HERE ---
+                    <div style={styles.contentFadeIn}>
                         <div style={styles.controlsContainer}>
-                        <div style={styles.storeDisplay}>
-                            <span>Shopping from: <strong>{selectedStoreDetails?.name}</strong></span>
-                            <button onClick={() => setSelectedStore(null)} style={styles.changeStoreButton}>Change Store</button>
-                        </div>
+                            <div style={styles.storeDisplay}>
+                                <span>Shopping from: <strong>{selectedStoreDetails?.name}</strong></span>
+                                <button onClick={() => setSelectedStore(null)} style={styles.changeStoreButton}>Change Store</button>
+                            </div>
 
-                        <input
-                            type="text"
-                            placeholder="Search for medicines..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            style={styles.searchInput}
-                        />
+                            <input
+                                type="text"
+                                placeholder="Search for medicines..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={styles.searchInput}
+                            />
                         </div>
                         <div style={styles.categoryTabs}>
                             {categories.map(category => (
@@ -183,6 +184,10 @@ function Dashboard() {
 
 // --- REFINED STYLES ---
 const styles = {
+    // --- ADD THIS NEW STYLE ---
+    contentFadeIn: {
+        animation: 'fadeInUp 0.5s ease-out forwards'
+    },
     container: { padding: '2rem' },
     heroSection: { textAlign: 'center', marginBottom: '2rem' },
     title: { margin: '0 0 0.5rem 0' },

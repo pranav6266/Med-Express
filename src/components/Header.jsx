@@ -3,12 +3,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
+// --- 1. IMPORT THE NEW THEME TOGGLE ---
+import ThemeToggle from './ThemeToggle.jsx';
 
 function Header() {
     const navigate = useNavigate();
-    const location = useLocation(); // Hook to check the current page
+    const location = useLocation();
     const { toggleCart, cartItems } = useCart();
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
+    // --- 2. MOVE THEME STATE AND LOGIC HERE ---
+    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
+    const toggleTheme = () => {
+        const newTheme = theme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+    };
+    useEffect(() => {
+        document.body.setAttribute('data-theme', theme);
+    }, [theme]);
+
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -31,31 +45,66 @@ function Header() {
     }, []);
 
     const getLinkStyle = (path) => {
-        return location.pathname === path ? { ...styles.navLink, ...styles.activeNavLink } : styles.navLink;
+        return location.pathname === path ?
+            { ...styles.navLink, ...styles.activeNavLink } : styles.navLink;
     };
+
+    const getDashboardPath = () => {
+        if (!userInfo) return '/login';
+        switch (userInfo.role) {
+            case 'admin':
+                return '/admin/dashboard';
+            case 'agent':
+                return '/agent/dashboard';
+            default:
+                return '/dashboard';
+        }
+    };
+
+    const dashboardPath = getDashboardPath();
+
+    const renderNavLinks = () => {
+        if (!userInfo) return null;
+        switch (userInfo.role) {
+            case 'admin':
+                return <span style={styles.roleIdentifier}>Admin Portal</span>;
+            case 'agent':
+                return <span style={styles.roleIdentifier}>Agent Portal</span>;
+            default:
+                return (
+                    <nav style={styles.navigation}>
+                        <Link to="/dashboard" style={getLinkStyle('/dashboard')}>Shop</Link>
+                        <Link to="/orders" style={getLinkStyle('/orders')}>My Orders</Link>
+                    </nav>
+                );
+        }
+    };
+
 
     return (
         <header style={styles.header}>
             <div style={styles.headerLeft}>
                 <div style={styles.logoContainer}>
-                    <Link to="/dashboard" style={styles.logo}>MedExpress</Link>
+                    <Link to={dashboardPath} style={styles.logo}>MedExpress</Link>
                     <span style={styles.tagline}>Your Health, Delivered Fast</span>
                 </div>
-                <nav style={styles.navigation}>
-                    <Link to="/dashboard" style={getLinkStyle('/dashboard')}>Shop</Link>
-                    <Link to="/orders" style={getLinkStyle('/orders')}>My Orders</Link>
-                </nav>
+                {renderNavLinks()}
             </div>
 
             <div style={styles.headerRight}>
+                {/* --- 3. ADD THE THEME TOGGLE TO THE HEADER --- */}
+                <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
+
                 {userInfo && (
                     <>
-                        <div onClick={toggleCart} style={styles.cartIconContainer}>
-                            <span>🛒</span>
-                            {cartItems.length > 0 && (
-                                <span style={styles.cartBadge}>{cartItems.length}</span>
-                            )}
-                        </div>
+                        {userInfo.role === 'user' && (
+                            <div onClick={toggleCart} style={styles.cartIconContainer}>
+                                <span>🛒</span>
+                                {cartItems.length > 0 && (
+                                    <span style={styles.cartBadge}>{cartItems.length}</span>
+                                )}
+                            </div>
+                        )}
 
                         <div style={styles.profileContainer} ref={dropdownRef}>
                             <img
@@ -87,7 +136,7 @@ function Header() {
     );
 }
 
-// --- REFINED STYLES ---
+// STYLES (NO CHANGES NEEDED HERE)
 const styles = {
     header: {
         display: 'flex',
@@ -125,6 +174,14 @@ const styles = {
         display: 'flex',
         gap: '2rem'
     },
+    roleIdentifier: {
+        fontSize: '1.1rem',
+        fontWeight: 'bold',
+        color: 'var(--primary-color)',
+        border: '1px solid var(--card-border)',
+        padding: '0.4rem 0.8rem',
+        borderRadius: '8px'
+    },
     navLink: {
         textDecoration: 'none',
         color: 'var(--text-color)',
@@ -140,7 +197,7 @@ const styles = {
     headerRight: {
         display: 'flex',
         alignItems: 'center',
-        gap: '1.5rem'
+        gap: '1rem' // Adjusted gap for the new icon
     },
     cartIconContainer: {
         position: 'relative',
