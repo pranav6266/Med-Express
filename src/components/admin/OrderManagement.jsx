@@ -5,7 +5,6 @@ import axios from 'axios';
 
 function OrderManagement() {
     const [orders, setOrders] = useState([]);
-    const [agents, setAgents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -14,14 +13,8 @@ function OrderManagement() {
             const userInfo = JSON.parse(localStorage.getItem('userInfo'));
             const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
 
-            // Fetch all orders
             const { data: ordersData } = await axios.get('/api/admin/orders', config);
             setOrders(ordersData);
-
-            // This is a placeholder for fetching agents. In a real app, you'd have an endpoint for this.
-            // For now, we'll simulate it.
-            // const { data: agentsData } = await axios.get('/api/admin/agents', config);
-            // setAgents(agentsData);
 
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to fetch data');
@@ -34,9 +27,7 @@ function OrderManagement() {
         fetchData();
     }, []);
 
-    const handleAssignAgent = async (orderId, agentId) => {
-        // In a real app, agentId would come from a dropdown.
-        // For now, prompt for it.
+    const handleAssignAgent = async (orderId) => {
         const promptedAgentId = prompt("Enter Agent ID to assign:");
         if (!promptedAgentId) return;
 
@@ -44,7 +35,7 @@ function OrderManagement() {
             const userInfo = JSON.parse(localStorage.getItem('userInfo'));
             const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
             await axios.post(`/api/admin/orders/${orderId}/assign`, { agentId: promptedAgentId }, config);
-            fetchData(); // Refresh data
+            fetchData();
         } catch (err) {
             alert('Failed to assign agent: ' + (err.response?.data?.message || 'Unknown error'));
         }
@@ -59,7 +50,8 @@ function OrderManagement() {
             {orders.map(order => (
                 <div key={order._id} style={styles.orderCard}>
                     <p><strong>Order ID:</strong> {order._id}</p>
-                    <p><strong>Customer:</strong> {order.user.name}</p>
+                    {/* FIX: Use optional chaining (?.) to prevent error if user is null */}
+                    <p><strong>Customer:</strong> {order.user?.name || 'User Not Found'}</p>
                     <p><strong>Status:</strong> {order.status}</p>
                     <p><strong>Assigned Agent:</strong> {order.agent || 'Not Assigned'}</p>
                     {order.status === 'Pending' && (

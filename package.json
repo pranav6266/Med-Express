@@ -9,7 +9,9 @@
     "start": "node server.js",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "data:import": "node seeder.js",
+    "data:destroy": "node seeder.js -d"
   },
   "dependencies": {
     "axios": "^1.11.0",
