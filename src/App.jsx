@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { CartProvider, useCart } from './context/CartContext.jsx';
+import { CartProvider } from './context/CartContext.jsx';
 import CartPanel from './components/CartPanel.jsx';
 
 // Import all your pages and components
+import LandingPage from './pages/LandingPage.jsx'; // <-- IMPORT THE NEW PAGE
 import Signup from './pages/Signup.jsx';
 import Login from './pages/Login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
@@ -20,33 +21,22 @@ import Profile from './pages/Profile.jsx';
 
 import './App.css';
 
-// AppContent remains mostly the same, but WITHOUT the <Router> component inside it.
+// AppContent remains mostly the same
 function AppContent() {
-    const { isCartOpen } = useCart();
+    // Note: The theme logic can be removed from here if each page now handles its own theme,
+    // or it can be kept as a global fallback. For simplicity, we assume it's kept.
     const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
-
-    const toggleTheme = () => {
-        const newTheme = theme === 'dark' ? 'light' : 'dark';
-        setTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
-    };
 
     useEffect(() => {
         document.body.setAttribute('data-theme', theme);
     }, [theme]);
 
-    const mainContentStyle = {
-        transition: 'margin-right 0.3s ease-in-out',
-        marginRight: isCartOpen ? '380px' : '0',
-    };
-
     return (
         <>
-            <div style={mainContentStyle}>
-                {/* The <Routes> component now sits directly inside AppContent */}
+            <div>
                 <Routes>
-                    {/* Public Routes */}
-                    <Route path="/" element={<Navigate to="/login" />} />
+                    {/* --- UPDATED ROUTES --- */}
+                    <Route path="/" element={<LandingPage />} /> {/* <-- New landing page route */}
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
 
@@ -69,19 +59,19 @@ function AppContent() {
                     </Route>
                 </Routes>
             </div>
+            {/* CartPanel will only appear on pages where CartProvider is active */}
             <CartPanel />
         </>
     );
 }
 
-// The main App component now wraps AppContent with the Router.
 function App() {
     return (
-        <CartProvider>
-            <Router>
+        <Router>
+            <CartProvider>
                 <AppContent />
-            </Router>
-        </CartProvider>
+            </CartProvider>
+        </Router>
     );
 }
 
