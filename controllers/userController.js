@@ -3,87 +3,106 @@
 import Medicine from '../models/medicineModel.js';
 import Order from '../models/orderModel.js';
 import User from "../models/userModel.js";
+import Store from '../models/storeModel.js';
 import axios from "axios";
 
 /**
- * @desc    Fetch all medicines with optional search
- * @route   GET /api/users/medicines
+ * @desc    Fetch all medicines available at a specific store
+ * @route   GET /api/users/medicines?storeId=...
  * @access  Public
  */
 export const getMedicines = async (req, res, next) => {
     try {
-        const keyword = req.query.keyword
-            ? {
-                name: {
-                    $regex: req.query.keyword,
-                    $options: 'i', // Case-insensitive
-                },
-            }
-            : {};
+        const { storeId } = req.query;
 
-        const medicines = await Medicine.find({ ...keyword });
-        res.json(medicines);
+        // If no storeId is provided, return an empty array
+        // as the frontend needs a store to be selected first.
+        if (!storeId) {
+            return res.json([]);
+        }
+
+        // Find all medicines that have an inventory entry for the specified store.
+        const medicinesInStore = await Medicine.find({
+            'inventory.storeId': storeId
+        });
+
+        // --- Data Transformation ---
+        // The query above returns the full medicine document, including the
+        // entire inventory array for all stores. We will format this data
+        // to be cleaner for the frontend.
+        const formattedMedicines = medicinesInStore.map(med => {
+            // Find the specific inventory details for the selected store.
+            const storeInventory = med.inventory.find(
+                (inv) => inv.storeId.toString() === storeId
+            );
+
+            // Create a new object with a simple 'stock' property instead of the whole array.
+            return {
+                _id: med._id,
+                name: med.name,
+                description: med.description,
+                price: med.price,
+                imageUrl: med.imageUrl,
+                stock: storeInventory ? storeInventory.stock : 0, // Fallback to 0 if not found
+            };
+        });
+
+        res.json(formattedMedicines);
     } catch (error) {
         next(error);
     }
 };
 
 /**
- * @desc    Create a new order and clear the user's cart
+ * @desc    Create a new order from items in the cart for a pre-selected store
  * @route   POST /api/users/orders
  * @access  Private (User)
  */
 export const placeOrder = async (req, res, next) => {
-    const { orderItems, deliveryAddress, totalAmount } = req.body;
+    // 1. Destructure all required info from the request body.
+    // The fulfillmentStore is now sent directly from the frontend.
+    const { orderItems, deliveryAddress, totalAmount, fulfillmentStore } = req.body;
 
     if (!orderItems || orderItems.length === 0) {
         return res.status(400).json({ message: 'No order items' });
     }
 
+    if (!fulfillmentStore) {
+        return res.status(400).json({ message: 'Store was not selected' });
+    }
+
     try {
-        // 1. Convert user's address to coordinates
-        const { latitude, longitude } = await getCoordsFromAddress(deliveryAddress);
-
-        // 2. Find the nearest store using a geospatial query
-        const nearestStore = await Store.findOne({
-            location: {
-                $near: {
-                    $geometry: {
-                        type: "Point",
-                        coordinates: [longitude, latitude] // [longitude, latitude] format
-                    }
-                }
-            }
-        });
-
-        if (!nearestStore) {
-            return res.status(404).json({ message: 'Could not find a store near you.' });
-        }
-
-        // 3. Verify stock for each item at the nearest store
+        // 2. Verify stock for each item AT THE SPECIFIC fulfillment store.
         for (const item of orderItems) {
             const medicine = await Medicine.findById(item.medicine);
+            if (!medicine) {
+                return res.status(404).json({ message: `Medicine with id ${item.medicine} not found.` });
+            }
+
             const storeInventory = medicine.inventory.find(
-                inv => inv.storeId.toString() === nearestStore._id.toString()
+                inv => inv.storeId.toString() === fulfillmentStore
             );
 
+            // Check if the store has this medicine and if the stock is sufficient.
             if (!storeInventory || storeInventory.stock < item.quantity) {
                 return res.status(400).json({
-                    message: `Sorry, '${medicine.name}' is out of stock at your nearest store (${nearestStore.name}).`
+                    message: `Sorry, '${medicine.name}' is out of stock at the selected store.`
                 });
             }
         }
 
-        // 4. If all checks pass, create the order
+        // 3. If all stock checks pass, create the new order.
         const order = new Order({
             user: req.user._id,
             items: orderItems,
             deliveryAddress,
             totalAmount,
-            fulfillmentStore: nearestStore._id // Assign the nearest store
+            fulfillmentStore: fulfillmentStore // Assign the store ID from the request.
         });
 
         const createdOrder = await order.save();
+
+        // 4. (Important) Clear the user's cart after the order is successfully placed.
         await User.findByIdAndUpdate(req.user._id, { $set: { cart: [] } });
 
         res.status(201).json(createdOrder);
@@ -261,5 +280,23 @@ const getCoordsFromAddress = async (address) => {
     } catch (error) {
         console.error('Geocoding error:', error.message);
         throw new Error('Failed to find coordinates for the address.');
+    }
+};
+
+/**
+ * @desc    Fetch all stores to populate selection dropdown
+ * @route   GET /api/users/stores
+ * @access  Public
+ */
+export const getAllStores = async (req, res, next) => {
+    try {
+        // Find all documents in the Store collection
+        const stores = await Store.find({});
+
+        // Send the array of stores back as a JSON response
+        res.json(stores);
+    } catch (error) {
+        // Pass any errors to the global error handler
+        next(error);
     }
 };

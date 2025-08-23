@@ -7,7 +7,6 @@ function MedicineModal({ medicine, onClose, onSave }) {
         name: '',
         description: '',
         price: '',
-        stock: '',
     });
     const [imageFile, setImageFile] = useState(null);
 
@@ -17,7 +16,6 @@ function MedicineModal({ medicine, onClose, onSave }) {
                 name: medicine.name || '',
                 description: medicine.description || '',
                 price: medicine.price || '',
-                stock: medicine.stock || '',
             });
         }
     }, [medicine]);
@@ -33,7 +31,6 @@ function MedicineModal({ medicine, onClose, onSave }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Pass both form data and the image file to the parent
         onSave(formData, imageFile);
     };
 
@@ -42,13 +39,26 @@ function MedicineModal({ medicine, onClose, onSave }) {
             <div style={styles.modalContent}>
                 <h2>{medicine ? 'Edit Medicine' : 'Add New Medicine'}</h2>
                 <form onSubmit={handleSubmit}>
-                    <input name="name" value={formData.name} onChange={handleChange} placeholder="Name" style={styles.input} required />
-                    <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Description" style={{...styles.input, ...styles.textarea}} required />
-                    <input name="price" type="number" value={formData.price} onChange={handleChange} placeholder="Price" style={styles.input} required />
-                    <input name="stock" type="number" value={formData.stock} onChange={handleChange} placeholder="Stock" style={styles.input} required />
+                    {/* --- NEW: Added labels and structure for clarity --- */}
+                    <div style={styles.formGroup}>
+                        <label htmlFor="med-name" style={styles.label}>Name</label>
+                        <input id="med-name" name="name" value={formData.name} onChange={handleChange} placeholder="e.g., Paracetamol 500mg" style={styles.input} required />
+                    </div>
 
-                    <label style={{marginBottom: '0.5rem', display: 'block'}}>Image</label>
-                    <input name="image" type="file" onChange={handleFileChange} style={styles.input} />
+                    <div style={styles.formGroup}>
+                        <label htmlFor="med-description" style={styles.label}>Description</label>
+                        <textarea id="med-description" name="description" value={formData.description} onChange={handleChange} placeholder="e.g., For fever and pain relief" style={{...styles.input, ...styles.textarea}} required />
+                    </div>
+
+                    <div style={styles.formGroup}>
+                        <label htmlFor="med-price" style={styles.label}>Price ($)</label>
+                        <input id="med-price" name="price" type="number" step="0.01" value={formData.price} onChange={handleChange} placeholder="e.g., 1.50" style={styles.input} required />
+                    </div>
+
+                    <div style={styles.formGroup}>
+                        <label htmlFor="med-image" style={styles.label}>Image</label>
+                        <input id="med-image" name="image" type="file" onChange={handleFileChange} style={styles.input} />
+                    </div>
 
                     <div style={styles.buttonGroup}>
                         <button type="button" onClick={onClose} style={styles.cancelButton}>Cancel</button>
@@ -63,9 +73,13 @@ function MedicineModal({ medicine, onClose, onSave }) {
 const styles = {
     modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 },
     modalContent: { backgroundColor: 'var(--card-background)', padding: '2rem', borderRadius: '12px', width: '90%', maxWidth: '500px' },
-    input: { width: '100%', padding: '0.75rem', marginBottom: '1rem', borderRadius: '8px', border: '1px solid var(--input-border)', backgroundColor: 'var(--input-background)', color: 'var(--text-color)', fontSize: '1rem', boxSizing: 'border-box' },
+    // --- NEW STYLES ---
+    formGroup: { marginBottom: '1.25rem' },
+    label: { display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' },
+    // --- UPDATED STYLE ---
+    input: { width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--input-border)', backgroundColor: 'var(--input-background)', color: 'var(--text-color)', fontSize: '1rem', boxSizing: 'border-box' },
     textarea: { minHeight: '100px', resize: 'vertical' },
-    buttonGroup: { display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' },
+    buttonGroup: { display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' },
     cancelButton: { backgroundColor: '#6c757d' }
 };
 

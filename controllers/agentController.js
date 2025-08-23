@@ -9,7 +9,13 @@ import Order from '../models/orderModel.js';
  */
 export const getAssignedOrders = async (req, res, next) => {
     try {
-        const orders = await Order.find({ agent: req.user._id });
+        // --- KEY CHANGE ---
+        // Populate related data to get store and user info for the dashboard.
+        const orders = await Order.find({ agent: req.user._id })
+            .sort({ createdAt: -1 })
+            .populate('user', 'name')
+            .populate('fulfillmentStore', 'name address'); // <-- ADD THIS
+
         res.json(orders);
     } catch (error) {
         next(error);
@@ -22,8 +28,9 @@ export const getAssignedOrders = async (req, res, next) => {
  * @access  Private (Agent)
  */
 export const updateOrderStatus = async (req, res, next) => {
+    // ... (This function remains unchanged)
     const { status } = req.body;
-    const allowedStatuses = ['Accepted', 'Picked Up', 'Delivered', 'Cancelled'];
+    const allowedStatuses = ['Picked Up', 'Delivered', 'Cancelled']; // 'Accepted' is done by admin
 
     if (!allowedStatuses.includes(status)) {
         return res.status(400).json({ message: 'Invalid status' });
@@ -31,12 +38,10 @@ export const updateOrderStatus = async (req, res, next) => {
 
     try {
         const order = await Order.findById(req.params.id);
-
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        // Ensure the agent is assigned to this order
         if (order.agent.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Not authorized to update this order' });
         }

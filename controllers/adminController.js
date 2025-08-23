@@ -68,15 +68,19 @@ export const deleteMedicine = async (req, res, next) => {
 // --- Order Controllers ---
 export const getAllOrders = async (req, res, next) => {
     try {
-        // Populate user and the new fulfillmentStore field
+        // --- KEY CHANGE ---
+        // We now also populate the 'agent' field to get the agent's name.
         const orders = await Order.find({})
             .populate('user', 'id name')
-            .populate('fulfillmentStore', 'name address'); // Add this line
+            .populate('fulfillmentStore', 'name address')
+            .populate('agent', 'name'); // <-- ADD THIS LINE
+
         res.json(orders);
     } catch (error) {
         next(error);
     }
 };
+
 
 export const assignAgentToOrder = async (req, res, next) => {
     const { agentId } = req.body;
@@ -93,6 +97,76 @@ export const assignAgentToOrder = async (req, res, next) => {
         order.status = 'Accepted';
         const updatedOrder = await order.save();
         res.json(updatedOrder);
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @desc    Get all medicines (for admin purposes)
+ * @route   GET /api/admin/medicines/all
+ * @access  Private (Admin)
+ */
+export const getAllMedicinesAdmin = async (req, res, next) => {
+    try {
+        // Fetch all medicines without any filtering to populate admin dropdowns
+        const medicines = await Medicine.find({}).sort({ name: 1 });
+        res.json(medicines);
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @desc    Update stock for a medicine at a specific store
+ * @route   PUT /api/admin/inventory
+ * @access  Private (Admin)
+ */
+export const updateStock = async (req, res, next) => {
+    const { medicineId, storeId, newStock } = req.body;
+
+    // Basic validation
+    if (!medicineId || !storeId || newStock === undefined) {
+        return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    try {
+        const medicine = await Medicine.findById(medicineId);
+        if (!medicine) {
+            return res.status(404).json({ message: 'Medicine not found' });
+        }
+
+        // Find the specific inventory item in the medicine's inventory array
+        const inventoryItem = medicine.inventory.find(
+            (item) => item.storeId.toString() === storeId
+        );
+
+        if (inventoryItem) {
+            // If it exists, update the stock
+            inventoryItem.stock = Number(newStock);
+        } else {
+            // If a medicine isn't assigned to a store, you can't update its stock
+            return res.status(404).json({ message: 'Medicine not stocked at this store' });
+        }
+
+        const updatedMedicine = await medicine.save();
+        res.json(updatedMedicine);
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @desc    Get all users with the 'agent' role
+ * @route   GET /api/admin/agents
+ * @access  Private (Admin)
+ */
+export const getAllAgents = async (req, res, next) => {
+    try {
+        // Find all users where role is 'agent' and select only their id and name
+        const agents = await User.find({ role: 'agent' }).select('id name');
+        res.json(agents);
     } catch (error) {
         next(error);
     }

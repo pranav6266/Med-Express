@@ -6,17 +6,43 @@ import Header from '../components/Header.jsx';
 import { useCart } from "../context/CartContext.jsx";
 
 function Dashboard() {
+    // Local state for this component
     const [medicines, setMedicines] = useState([]);
+    const [stores, setStores] = useState([]); // State to hold the list of stores
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
-    const { addToCart } = useCart();
 
+    // Global state from CartContext
+    const { addToCart, selectedStore, setSelectedStore } = useCart();
+
+    // Effect to fetch all available stores when the component mounts
     useEffect(() => {
+        const fetchStores = async () => {
+            try {
+                const { data } = await axios.get('/api/users/stores');
+                setStores(data);
+            } catch (err) {
+                setError('Could not fetch stores. Please try again later.');
+            }
+        };
+        fetchStores();
+    }, []);
+
+    // Effect to fetch medicines whenever a store is selected or the search term changes
+    useEffect(() => {
+        // Only fetch medicines if a store has been selected
+        if (!selectedStore) {
+            setMedicines([]); // Clear medicines if no store is selected
+            setLoading(false);
+            return;
+        }
+
         const fetchMedicines = async () => {
             try {
                 setLoading(true);
-                const { data } = await axios.get(`/api/users/medicines?keyword=${searchTerm}`);
+                // Updated API call to fetch medicines for the specific store
+                const { data } = await axios.get(`/api/users/medicines?storeId=${selectedStore}`);
                 setMedicines(data);
                 setError('');
             } catch (err) {
@@ -28,32 +54,54 @@ function Dashboard() {
         };
 
         fetchMedicines();
-    }, [searchTerm]);
+    }, [selectedStore, searchTerm]); // Re-run this effect when selectedStore or searchTerm changes
 
-    // This function now correctly only handles the logic
     const handleAddToCart = (med) => {
         if (med.stock > 0) {
-            addToCart(med._id, 1); // Add 1 unit of the medicine
+            addToCart(med._id, 1);
         }
     };
 
-    // This is the main return statement for the Dashboard component
+    // Handler for the dropdown selection
+    const handleStoreChange = (e) => {
+        setSelectedStore(e.target.value);
+    };
+
     return (
         <div>
             <Header />
             <div style={styles.container}>
                 <h1 style={styles.title}>Our Medicines</h1>
+
+                {/* Store Selection Dropdown */}
+                <select onChange={handleStoreChange} value={selectedStore || ''} style={styles.storeSelector}>
+                    <option value="" disabled>-- Select a Pharmacy --</option>
+                    {stores.map(store => (
+                        <option key={store._id} value={store._id}>
+                            {store.name} - {store.address}
+                        </option>
+                    ))}
+                </select>
+
+                {/* Search input is disabled until a store is selected */}
                 <input
                     type="text"
                     placeholder="Search for medicines..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     style={styles.searchInput}
+                    disabled={!selectedStore}
                 />
+
+                {/* Conditional Rendering Logic */}
                 {loading ? (
                     <p>Loading...</p>
                 ) : error ? (
                     <p style={styles.errorMessage}>{error}</p>
+                ) : !selectedStore ? (
+                    <p style={styles.prompt}>Please select a store to view available medicines.</p>
+                ) : medicines.length === 0 ? (
+                    <p style={styles.prompt}>No medicines found at this store.</p>
                 ) : (
                     <div style={styles.grid}>
                         {medicines.map((med) => (
@@ -68,7 +116,7 @@ function Dashboard() {
                                 <button
                                     style={styles.button}
                                     disabled={med.stock === 0}
-                                    onClick={() => handleAddToCart(med)} // Correctly calls the handler
+                                    onClick={() => handleAddToCart(med)}
                                 >
                                     {med.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
                                 </button>
@@ -81,10 +129,20 @@ function Dashboard() {
     );
 }
 
-// Styling
+// Styling (with new styles added)
 const styles = {
     container: { padding: '0 2rem' },
-    title: { textAlign: 'center', marginBottom: '2rem' },
+    title: { textAlign: 'center', marginBottom: '1rem' },
+    storeSelector: {
+        width: '100%',
+        padding: '0.75rem',
+        marginBottom: '1rem',
+        borderRadius: '8px',
+        border: '1px solid var(--input-border)',
+        backgroundColor: 'var(--input-background)',
+        color: 'var(--text-color)',
+        fontSize: '1rem',
+    },
     searchInput: {
         width: '100%',
         padding: '0.75rem',
@@ -94,6 +152,12 @@ const styles = {
         backgroundColor: 'var(--input-background)',
         color: 'var(--text-color)',
         fontSize: '1rem',
+    },
+    prompt: {
+        textAlign: 'center',
+        fontSize: '1.2rem',
+        color: '#aaa',
+        padding: '2rem',
     },
     grid: {
         display: 'grid',

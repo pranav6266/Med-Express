@@ -7,7 +7,9 @@ import {
     getMyOrders,
     addToCart,
     getCart,
-    removeFromCart, updateCartItemQuantity
+    removeFromCart,
+    updateCartItemQuantity,
+    getAllStores,
 } from '../controllers/userController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
@@ -38,7 +40,6 @@ router.route('/cart/:medicineId')
     .put(protect, authorize('user'), updateCartItemQuantity)
     .delete(protect, authorize('user'), removeFromCart);
 
-
-
+router.get('/stores', getAllStores);
 
 export default router;
