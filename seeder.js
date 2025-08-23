@@ -25,7 +25,13 @@ const importData = async () => {
         // Clear existing data
         await Order.deleteMany();
         await Medicine.deleteMany();
+        await User.deleteMany();
 
+        // --- FIX: Re-added user creation ---
+        // Create users without hashing passwords again
+        const createdUsers = await User.insertMany(users);
+        const normalUser = createdUsers.find(u => u.role === 'user');
+        const agentUser = createdUsers.find(u => u.role === 'agent');
 
         // Insert new medicines
         const createdMedicines = await Medicine.insertMany(medicines);
@@ -34,7 +40,6 @@ const importData = async () => {
         // --- Create Dummy Orders ---
         const sampleOrders = [];
         for (let i = 0; i < 20; i++) {
-            // Get 1 to 3 random medicines for the order
             const orderItems = [];
             const numItems = Math.floor(Math.random() * 3) + 1;
             let totalAmount = 0;
@@ -60,7 +65,6 @@ const importData = async () => {
                 totalAmount: totalAmount,
                 deliveryAddress: '123 Test St, Bangalore, India',
                 status: randomStatus,
-                // Assign an agent only if status is not Pending or Cancelled
                 agent: (randomStatus !== 'Pending' && randomStatus !== 'Cancelled') ? agentUser._id : null,
             });
         }
@@ -81,6 +85,7 @@ const destroyData = async () => {
     try {
         await Order.deleteMany();
         await Medicine.deleteMany();
+        await User.deleteMany();
 
         console.log('Data Destroyed!');
         process.exit();
@@ -90,7 +95,6 @@ const destroyData = async () => {
     }
 };
 
-// Check for command line arguments
 if (process.argv[2] === '-d') {
     destroyData();
 } else {

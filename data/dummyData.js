@@ -16,14 +16,14 @@ export const users = [
     },
     {
         name: 'Agent Smith',
-        email: '$2a$10$U1/LPbV8iR9xxPSft1joguOOqxWJ2poHiB.MYTXPOMrpm/Z5L.UR6',
-        password: 'password123',
+        email: 'agent@gmail.com',
+        password: '$2a$10$U1/LPbV8iR9xxPSft1joguOOqxWJ2poHiB.MYTXPOMrpm/Z5L.UR6',
         role: 'agent',
     },
 ];
 
 export const medicines = [
-    { name: 'Paracetamol 500mg', description: 'For fever and pain relief', price: 1.50, stock: 100 },
+    { name: 'Paracetamol 500mg', description: 'For fever and pain relief', price: 1.50, stock: 100, imageUrl: "./public/medicine-images/paracetamol.jpeg" },
     { name: 'Ibuprofen 200mg', description: 'Anti-inflammatory and pain relief', price: 2.75, stock: 80 },
     { name: 'Aspirin 75mg', description: 'Blood thinner, for heart conditions', price: 3.20, stock: 120 },
     { name: 'Loratadine 10mg', description: 'Antihistamine for allergies', price: 5.50, stock: 60 },
