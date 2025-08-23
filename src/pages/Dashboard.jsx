@@ -150,7 +150,7 @@ function Dashboard() {
                                             <h3 className={styles.medName}>{med.name}</h3>
                                             <p className={styles.medDescription}>{med.description}</p>
                                             <div className={styles.cardFooter}>
-                                                <p className={styles.medPrice}>${med.price.toFixed(2)}</p>
+                                                <p className={styles.medPrice}>₹{med.price.toFixed(2)}</p>
                                                 <button
                                                     className={styles.addToCartButton}
                                                     disabled={med.stock === 0}

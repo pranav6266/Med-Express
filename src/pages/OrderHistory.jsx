@@ -79,7 +79,7 @@ function OrderHistory() {
                                     </div>
                                     <div style={styles.cardBody}>
                                         <p><strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}</p>
-                                        <p><strong>Total:</strong> ${order.totalAmount.toFixed(2)}</p>
+                                        <p><strong>Total:</strong> ₹{order.totalAmount.toFixed(2)}</p>
                                     </div>
                                     <div style={styles.cardFooter}>
                                         <button onClick={() => setSelectedOrder(order)} style={styles.detailsButton}>

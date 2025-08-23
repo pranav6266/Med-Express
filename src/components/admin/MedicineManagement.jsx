@@ -119,7 +119,7 @@ function MedicineManagement() {
                             <img src={med.imageUrl} alt={med.name} style={styles.tableImage} />
                         </td>
                         <td style={styles.td}>{med.name}</td>
-                        <td style={styles.td}>${med.price.toFixed(2)}</td>
+                        <td style={styles.td}>₹{med.price.toFixed(2)}</td>
                         <td style={styles.td}>
                             <button onClick={() => handleEdit(med)} style={{...styles.button, ...styles.editButton}}>Edit</button>
                             <button onClick={() => handleDelete(med._id)} style={{...styles.button, ...styles.deleteButton}}>Delete</button>

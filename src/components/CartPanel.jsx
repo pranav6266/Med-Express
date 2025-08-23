@@ -69,7 +69,7 @@ function CartPanel() {
                                     </div>
                                 </div>
                                 <div style={styles.itemActions}>
-                                    <p style={styles.itemPrice}>${(item.medicine.price * item.quantity).toFixed(2)}</p>
+                                    <p style={styles.itemPrice}>₹{(item.medicine.price * item.quantity).toFixed(2)}</p>
                                     <button onClick={() => removeFromCart(item.medicine._id)} style={styles.removeButton} aria-label="Remove item">
                                         🗑️
                                     </button>
@@ -83,7 +83,7 @@ function CartPanel() {
                     <div style={styles.footer}>
                         <div style={styles.totalSection}>
                             <span>Total</span>
-                            <span>${totalAmount.toFixed(2)}</span>
+                            <span>₹{totalAmount.toFixed(2)}</span>
                         </div>
                         <button onClick={handleCheckout} style={styles.checkoutButton}>
                             Proceed to Checkout

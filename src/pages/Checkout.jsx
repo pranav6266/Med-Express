@@ -128,13 +128,13 @@ function Checkout() {
                             <div key={item.medicine._id} style={styles.item}>
                                 <span style={styles.itemName}>{item.medicine.name} (x{item.quantity})</span>
                                 <span style={styles.itemTotal}>
-                                    {`$${(item.medicine.price * item.quantity).toFixed(2)}`}
+                                    {`₹${(item.medicine.price * item.quantity).toFixed(2)}`}
                                 </span>
                             </div>
                         ))}
                         <div style={{ ...styles.item, ...styles.totalLine }}>
                             <span style={{ fontWeight: 'bold' }}>Total</span>
-                            <span style={{ fontWeight: 'bold' }}>${totalAmount.toFixed(2)}</span>
+                            <span style={{ fontWeight: 'bold' }}>₹{totalAmount.toFixed(2)}</span>
                         </div>
                     </div>
 

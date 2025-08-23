@@ -51,7 +51,7 @@ function MedicineModal({ medicine, onClose, onSave }) {
                     </div>
 
                     <div style={styles.formGroup}>
-                        <label htmlFor="med-price" style={styles.label}>Price ($)</label>
+                        <label htmlFor="med-price" style={styles.label}>Price (₹)</label>
                         <input id="med-price" name="price" type="number" step="0.01" value={formData.price} onChange={handleChange} placeholder="e.g., 1.50" style={styles.input} required />
                     </div>
 

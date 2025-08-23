@@ -43,13 +43,13 @@ function OrderDetailsModal({ order, onClose }) {
                             <tr key={index}>
                                 <td style={styles.td}>{item.name}</td>
                                 <td style={styles.td}>{item.quantity}</td>
-                                <td style={styles.td}>${item.price.toFixed(2)}</td>
-                                <td style={styles.td}>${(item.quantity * item.price).toFixed(2)}</td>
+                                <td style={styles.td}>₹{item.price.toFixed(2)}</td>
+                                <td style={styles.td}>₹{(item.quantity * item.price).toFixed(2)}</td>
                             </tr>
                         ))}
                         </tbody>
                     </table>
-                    <p style={styles.total}><strong>Total Amount:</strong> ${order.totalAmount.toFixed(2)}</p>
+                    <p style={styles.total}><strong>Total Amount:</strong> ₹{order.totalAmount.toFixed(2)}</p>
                 </div>
             </div>
 
