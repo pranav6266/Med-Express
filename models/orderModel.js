@@ -13,7 +13,6 @@ const orderItemSchema = new mongoose.Schema({
     price: { type: Number, required: true },
 });
 
-
 const orderSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -23,6 +22,12 @@ const orderSchema = new mongoose.Schema({
     agent: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User', // Refers to a user with the 'agent' role
+        default: null,
+    },
+    // --- ADD THIS FIELD ---
+    fulfillmentStore: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Store',
         default: null,
     },
     items: [orderItemSchema],

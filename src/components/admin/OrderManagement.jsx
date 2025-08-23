@@ -50,9 +50,16 @@ function OrderManagement() {
             {orders.map(order => (
                 <div key={order._id} style={styles.orderCard}>
                     <p><strong>Order ID:</strong> {order._id}</p>
-                    {/* FIX: Use optional chaining (?.) to prevent error if user is null */}
                     <p><strong>Customer:</strong> {order.user?.name || 'User Not Found'}</p>
                     <p><strong>Status:</strong> {order.status}</p>
+                    {/* Display Fulfillment Store Info */}
+                    {order.fulfillmentStore ? (
+                        <div style={styles.storeInfo}>
+                            <strong>Fulfillment Store:</strong>
+                            <p>{order.fulfillmentStore.name}</p>
+                            <small>{order.fulfillmentStore.address}</small>
+                        </div>
+                    ) : <p>Store not assigned.</p>}
                     <p><strong>Assigned Agent:</strong> {order.agent || 'Not Assigned'}</p>
                     {order.status === 'Pending' && (
                         <button onClick={() => handleAssignAgent(order._id)}>Assign Agent</button>

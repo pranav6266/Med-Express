@@ -2,7 +2,12 @@
 
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { users, medicines } from './data/dummyData.js';
+// Data needs to be imported before models that use it
+import { users, medicines, stores } from './data/dummyData.js';
+
+// --- CORRECTED IMPORT ORDER ---
+// Import parent models BEFORE models that reference them
+import Store from './models/storeModel.js'; // <-- IMPORT STORE FIRST
 import User from './models/userModel.js';
 import Medicine from './models/medicineModel.js';
 import Order from './models/orderModel.js';
@@ -26,18 +31,33 @@ const importData = async () => {
         await Order.deleteMany();
         await Medicine.deleteMany();
         await User.deleteMany();
+        await Store.deleteMany(); // Clear stores as well
 
-        // --- FIX: Re-added user creation ---
-        // Create users without hashing passwords again
+        console.log('Cleared existing data.');
+
+        // --- Step 1: Create Users ---
         const createdUsers = await User.insertMany(users);
-        const normalUser = createdUsers.find(u => u.role === 'user');
         const agentUser = createdUsers.find(u => u.role === 'agent');
+        const normalUser = createdUsers.find(u => u.role === 'user');
+        console.log('Users Imported!');
 
-        // Insert new medicines
-        const createdMedicines = await Medicine.insertMany(medicines);
-        console.log('Users and Medicines Imported!');
+        // --- Step 2: Create Stores ---
+        const createdStores = await Store.insertMany(stores);
+        console.log('Stores Imported!');
 
-        // --- Create Dummy Orders ---
+        // --- Step 3: Create Medicines with Store-Based Inventory ---
+        const medicinesWithInventory = medicines.map(med => {
+            const inventory = createdStores.map(store => ({
+                storeId: store._id,
+                stock: Math.floor(Math.random() * 200) + 10 // Random stock between 10 and 210
+            }));
+            return { ...med, inventory };
+        });
+
+        const createdMedicines = await Medicine.insertMany(medicinesWithInventory);
+        console.log('Medicines with Inventory Imported!');
+
+        // --- Step 4: Create Dummy Orders ---
         const sampleOrders = [];
         for (let i = 0; i < 20; i++) {
             const orderItems = [];
@@ -59,6 +79,8 @@ const importData = async () => {
             const statuses = ['Pending', 'Accepted', 'Picked Up', 'Delivered', 'Cancelled'];
             const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
 
+            const randomStore = createdStores[Math.floor(Math.random() * createdStores.length)];
+
             sampleOrders.push({
                 user: normalUser._id,
                 items: orderItems,
@@ -66,6 +88,7 @@ const importData = async () => {
                 deliveryAddress: '123 Test St, Bangalore, India',
                 status: randomStatus,
                 agent: (randomStatus !== 'Pending' && randomStatus !== 'Cancelled') ? agentUser._id : null,
+                fulfillmentStore: randomStore._id,
             });
         }
 
@@ -86,6 +109,7 @@ const destroyData = async () => {
         await Order.deleteMany();
         await Medicine.deleteMany();
         await User.deleteMany();
+        await Store.deleteMany();
 
         console.log('Data Destroyed!');
         process.exit();

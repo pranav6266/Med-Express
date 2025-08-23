@@ -7,7 +7,7 @@ import {
     getMyOrders,
     addToCart,
     getCart,
-    removeFromCart
+    removeFromCart, updateCartItemQuantity
 } from '../controllers/userController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
@@ -34,7 +34,10 @@ router.route('/cart')
     .get(protect, authorize('user'), getCart)
     .post(protect, authorize('user'), addToCart);
 
-router.delete('/cart/:medicineId', protect, authorize('user'), removeFromCart);
+router.route('/cart/:medicineId')
+    .put(protect, authorize('user'), updateCartItemQuantity)
+    .delete(protect, authorize('user'), removeFromCart);
+
 
 
 

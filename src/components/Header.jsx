@@ -2,10 +2,12 @@
 
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext.jsx'; // Import the useCart hook
 
 function Header() {
     const navigate = useNavigate();
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const { toggleCart, cartItems } = useCart(); // Get cart functions and data
 
     const handleLogout = () => {
         localStorage.removeItem('userInfo');
@@ -14,7 +16,6 @@ function Header() {
 
     const renderNavLinks = () => {
         if (!userInfo) return null;
-
         switch (userInfo.role) {
             case 'user':
                 return (
@@ -58,13 +59,24 @@ function Header() {
             </nav>
             <div style={styles.userSection}>
                 {userInfo && <span style={styles.userName}>{userInfo.name} ({userInfo.role})</span>}
+
+                {/* --- NEW: Cart Button --- */}
+                {userInfo && userInfo.role === 'user' && (
+                    <button onClick={toggleCart} style={styles.cartButton}>
+                        🛒
+                        {cartItems.length > 0 && (
+                            <span style={styles.cartBadge}>{cartItems.length}</span>
+                        )}
+                    </button>
+                )}
+
                 <button onClick={handleLogout} style={styles.logoutButton}>Logout</button>
             </div>
         </header>
     );
 }
 
-// Basic styling
+// Styling
 const styles = {
     header: {
         display: 'flex',
@@ -100,6 +112,26 @@ const styles = {
     },
     userName: {
         fontWeight: '500',
+    },
+    // --- NEW: Cart Button Styles ---
+    cartButton: {
+        position: 'relative',
+        background: 'none',
+        border: 'none',
+        fontSize: '1.5rem',
+        cursor: 'pointer',
+        color: 'var(--text-color)',
+    },
+    cartBadge: {
+        position: 'absolute',
+        top: '-5px',
+        right: '-10px',
+        background: 'var(--glow-color)',
+        color: 'white',
+        borderRadius: '50%',
+        padding: '0.1rem 0.4rem',
+        fontSize: '0.75rem',
+        fontWeight: 'bold',
     },
     logoutButton: {
         padding: '0.5rem 1rem',

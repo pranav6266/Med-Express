@@ -17,12 +17,20 @@ const medicineSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    stock: {
-        type: Number,
-        required: true,
-        default: 0,
-        min: 0,
-    },
+    // REPLACED 'stock' with a store-based inventory system
+    inventory: [{
+        storeId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Store',
+            required: true,
+        },
+        stock: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+        },
+    }],
     imageUrl: {
         type: String,
         default: '/images/default-medicine.png',

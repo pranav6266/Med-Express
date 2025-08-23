@@ -58,6 +58,18 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    // --- NEW: Function to update quantity ---
+    const updateQuantity = async (medicineId, quantity) => {
+        try {
+            const { data } = await axios.put(`/api/users/cart/${medicineId}`, { quantity }, getConfig());
+            setCartItems(data);
+        } catch (err) {
+            // Display specific error from backend if available
+            alert('Error updating quantity: ' + (err.response?.data?.message || 'Server error'));
+        }
+    };
+
+
     const toggleCart = () => setIsCartOpen(!isCartOpen);
     const closeCart = () => setIsCartOpen(false);
 
@@ -68,8 +80,10 @@ export const CartProvider = ({ children }) => {
         error,
         addToCart,
         removeFromCart,
+        updateQuantity, // Expose the new function
         toggleCart,
         closeCart,
+        fetchCart,
     };
 
     return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

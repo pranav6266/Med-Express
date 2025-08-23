@@ -68,7 +68,10 @@ export const deleteMedicine = async (req, res, next) => {
 // --- Order Controllers ---
 export const getAllOrders = async (req, res, next) => {
     try {
-        const orders = await Order.find({}).populate('user', 'id name');
+        // Populate user and the new fulfillmentStore field
+        const orders = await Order.find({})
+            .populate('user', 'id name')
+            .populate('fulfillmentStore', 'name address'); // Add this line
         res.json(orders);
     } catch (error) {
         next(error);
