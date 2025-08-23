@@ -1,5 +1,3 @@
-// src/pages/Signup.jsx
-
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -15,7 +13,7 @@ function Signup() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    // --- State for simplified email validation ---
+    // Email verification
     const [emailError, setEmailError] = useState('');
 
     const toggleTheme = () => {
@@ -28,7 +26,6 @@ function Signup() {
         document.body.setAttribute('data-theme', theme);
     }, [theme]);
 
-    // This complex useEffect for backend checking is now removed.
 
     const handleSignUp = async (e) => {
         e.preventDefault();

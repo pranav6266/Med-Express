@@ -1,5 +1,3 @@
-// controllers/adminController.js
-
 import Medicine from '../models/medicineModel.js';
 import Order from '../models/orderModel.js';
 import User from '../models/userModel.js';
@@ -68,8 +66,6 @@ export const deleteMedicine = async (req, res, next) => {
 // --- Order Controllers ---
 export const getAllOrders = async (req, res, next) => {
     try {
-        // --- KEY CHANGE ---
-        // We now also populate the 'agent' field to get the agent's name.
         const orders = await Order.find({})
             .populate('user', 'id name')
             .populate('fulfillmentStore', 'name address')

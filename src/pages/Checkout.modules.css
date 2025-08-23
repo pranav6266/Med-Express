@@ -1,0 +1,85 @@
+/* src/pages/Checkout.module.css */
+.orderSummary {
+    width: 100%;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: var(--input-background);
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+}
+
+.item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--surface-border);
+}
+
+.item:last-child {
+    border-bottom: none;
+}
+
+.totalLine {
+    margin-top: 0.5rem;
+    font-weight: bold;
+}
+
+.itemName {
+    color: var(--text-muted);
+}
+
+.itemTotal {
+    font-weight: 500;
+}
+
+.sectionContainer {
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.sectionHeader {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--surface-border);
+    padding-bottom: 0.5rem;
+}
+
+.addressGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+}
+
+.fullWidth {
+    grid-column: 1 / -1;
+}
+
+.input {
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-background);
+    color: var(--text-color);
+    font-size: 1rem;
+    margin-top: 0.25rem;
+}
+
+.codText {
+    margin: 0;
+    padding: 0.85rem;
+    background-color: var(--surface-background);
+    border-radius: 8px;
+}
+
+.placeOrderButton {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.85rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+}

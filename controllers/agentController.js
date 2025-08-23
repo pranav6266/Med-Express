@@ -1,5 +1,3 @@
-// controllers/agentController.js
-
 import Order from '../models/orderModel.js';
 
 /**
@@ -9,7 +7,6 @@ import Order from '../models/orderModel.js';
  */
 export const getAssignedOrders = async (req, res, next) => {
     try {
-        // --- KEY CHANGE ---
         // Populate related data to get store and user info for the dashboard.
         const orders = await Order.find({ agent: req.user._id })
             .sort({ createdAt: -1 })

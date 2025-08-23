@@ -86,7 +86,7 @@ function Profile() {
     };
 
     const handleClose = () => {
-        navigate(-1); // Navigates to the previous page in history
+        navigate(-1);
     };
 
 

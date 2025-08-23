@@ -1,5 +1,3 @@
-// controllers/userController.js
-
 import Medicine from '../models/medicineModel.js';
 import Order from '../models/orderModel.js';
 import User from "../models/userModel.js";

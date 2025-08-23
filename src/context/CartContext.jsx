@@ -13,7 +13,7 @@ export const CartProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // --- NEW STATE ---
+
     // State to manage which store the user has selected.
     // This is placed in the context so other components (like Checkout) can access it.
     const [selectedStore, setSelectedStore] = useState(null);
@@ -26,7 +26,6 @@ export const CartProvider = ({ children }) => {
     };
 
     const fetchCart = async () => {
-        // ... (rest of the function is unchanged)
         try {
             setLoading(true);
             const { data } = await axios.get('/api/users/cart', getConfig());
@@ -45,7 +44,6 @@ export const CartProvider = ({ children }) => {
     }, []);
 
     const addToCart = async (medicineId, quantity = 1) => {
-        // ... (rest of the function is unchanged)
         try {
             const { data } = await axios.post('/api/users/cart', { medicineId, quantity }, getConfig());
             setCartItems(data);
@@ -56,7 +54,6 @@ export const CartProvider = ({ children }) => {
     };
 
     const removeFromCart = async (medicineId) => {
-        // ... (rest of the function is unchanged)
         try {
             const { data } = await axios.delete(`/api/users/cart/${medicineId}`, getConfig());
             setCartItems(data);
@@ -66,7 +63,6 @@ export const CartProvider = ({ children }) => {
     };
 
     const updateQuantity = async (medicineId, quantity) => {
-        // ... (rest of the function is unchanged)
         try {
             const { data } = await axios.put(`/api/users/cart/${medicineId}`, { quantity }, getConfig());
             setCartItems(data);
@@ -84,8 +80,8 @@ export const CartProvider = ({ children }) => {
         isCartOpen,
         loading,
         error,
-        selectedStore, // <-- NEW
-        setSelectedStore, // <-- NEW
+        selectedStore,
+        setSelectedStore,
         addToCart,
         removeFromCart,
         updateQuantity,

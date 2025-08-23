@@ -5,52 +5,42 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
 import Header from '../components/Header.jsx';
+import formStyles from './AuthForm.module.css'; // For container and card
+import styles from './Checkout.module.css'; // For component-specific styles
 
 function Checkout() {
     const { cartItems, fetchCart, selectedStore } = useCart();
     const navigate = useNavigate();
 
-    // --- REFACTORED STATE ---
-    const [view, setView] = useState('LOADING');
-    const [savedAddress, setSavedAddress] = useState(null);
-    const [formData, setFormData] = useState({name: '', phone: '', address: { flatNo: '', road: '', locality: '', pincode: '', landmark: '', city: 'Bangalore', state: 'Karnataka' }});
+    const [formData, setFormData] = useState({ name: '', phone: '', address: { flatNo: '', road: '', locality: '', pincode: '', landmark: '', city: 'Bangalore', state: 'Karnataka' }});
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const loadAddress = async () => {
-            // Priority 1: Check for a 'lastUsedAddress' in localStorage
-            const lastUsedAddress = JSON.parse(localStorage.getItem('lastUsedAddress'));
-            if (lastUsedAddress) {
-                setSavedAddress(lastUsedAddress);
-                setView('CONFIRM_ADDRESS');
-                return;
-            }
-
-            // Priority 2: Fetch the user's profile for their default address
+        const loadProfileInfo = async () => {
             try {
                 const userInfo = JSON.parse(localStorage.getItem('userInfo'));
                 const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
                 const { data: profile } = await axios.get('/api/users/profile', config);
 
-                if (profile.address && profile.address.locality) {
-                    setSavedAddress(profile.address);
-                    setView('CONFIRM_ADDRESS');
-                } else {
-                    // If no address is found anywhere, go directly to the edit form
-                    setView('EDIT_ADDRESS');
-                }
-
-                // Pre-fill user contact info regardless
-                setFormData(prev => ({ ...prev, name: profile.name, phone: profile.phone }));
-
+                const profileAddress = profile.address || {};
+                setFormData(prev => ({
+                    ...prev,
+                    name: profile.name || '',
+                    phone: profile.phone || '',
+                    address: {
+                        ...prev.address,
+                        flatNo: profileAddress.flatNo || '',
+                        road: profileAddress.road || '',
+                        locality: profileAddress.locality || '',
+                        pincode: profileAddress.pincode || '',
+                    }
+                }));
             } catch (err) {
-                // If fetching fails, go to edit form
-                setView('EDIT_ADDRESS');
+                console.error("Failed to fetch profile for pre-fill");
             }
         };
-
-        loadAddress();
+        loadProfileInfo();
     }, []);
 
     const handleChange = (e) => {
@@ -80,13 +70,7 @@ function Checkout() {
         setLoading(true);
         setError('');
 
-        const saveProfileInfo = async () => {
-            console.log("Simulating: Saving updated profile info for future use...", { name, phone, address });
-        };
-
         try {
-            await saveProfileInfo();
-
             const optionalFlat = address.flatNo ? `${address.flatNo}, ` : '';
             const optionalLandmark = address.landmark ? ` (Landmark: ${address.landmark})` : '';
             const formattedAddress = `${optionalFlat}${address.road}, ${address.locality}, ${address.city}, ${address.state} - ${address.pincode}${optionalLandmark}`;
@@ -102,9 +86,8 @@ function Checkout() {
                 orderItems, deliveryAddress: formattedAddress, totalAmount, fulfillmentStore: selectedStore,
             }, config);
 
-            localStorage.setItem('lastUsedAddress', JSON.stringify(addressToUse));
-            await fetchCart();
-            navigate('/orders');
+            await fetchCart(); // Clear the cart
+            navigate('/orders'); // Redirect to order history
 
         } catch (err) {
             const message = err.response?.data?.message || 'Failed to place order.';
@@ -117,57 +100,56 @@ function Checkout() {
     return (
         <div>
             <Header />
-            <div className="form-container">
-                <div className="form-card" style={{ maxWidth: '700px' }}>
+            <div className={formStyles.formContainer}>
+                <div className={formStyles.formCard} style={{ maxWidth: '700px' }}>
                     <h2>Checkout</h2>
 
-                    {/* --- RESTORED: Order Summary Section --- */}
-                    <div style={styles.orderSummary}>
+                    <div className={styles.orderSummary}>
                         <h3>Order Summary</h3>
                         {cartItems.map(item => (
-                            <div key={item.medicine._id} style={styles.item}>
-                                <span style={styles.itemName}>{item.medicine.name} (x{item.quantity})</span>
-                                <span style={styles.itemTotal}>
-                                    {`₹${(item.medicine.price * item.quantity).toFixed(2)}`}
+                            <div key={item.medicine._id} className={styles.item}>
+                                <span className={styles.itemName}>{item.medicine.name} (x{item.quantity})</span>
+                                <span className={styles.itemTotal}>
+                                    ₹{(item.medicine.price * item.quantity).toFixed(2)}
                                 </span>
                             </div>
                         ))}
-                        <div style={{ ...styles.item, ...styles.totalLine }}>
-                            <span style={{ fontWeight: 'bold' }}>Total</span>
-                            <span style={{ fontWeight: 'bold' }}>₹{totalAmount.toFixed(2)}</span>
+                        <div className={`${styles.item} ${styles.totalLine}`}>
+                            <span>Total</span>
+                            <span>₹{totalAmount.toFixed(2)}</span>
                         </div>
                     </div>
 
                     <form onSubmit={handlePlaceOrder} style={{ width: '100%' }}>
-                        <div style={styles.sectionContainer}>
-                            <h3 style={styles.sectionHeader}>Contact Information</h3>
-                            <div style={styles.formGroup}>
+                        <div className={styles.sectionContainer}>
+                            <h3 className={styles.sectionHeader}>Contact Information</h3>
+                            <div className={styles.formGroup}>
                                 <label>Full Name*</label>
-                                <input type="text" name="name" value={formData.name} onChange={handleChange} style={styles.input} required />
+                                <input type="text" name="name" value={formData.name} onChange={handleChange} className={styles.input} required />
                             </div>
-                            <div style={styles.formGroup}>
+                            <div className={styles.formGroup}>
                                 <label>Phone Number*</label>
-                                <input type="tel" name="phone" value={formData.phone} onChange={handleChange} style={styles.input} required />
+                                <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className={styles.input} required />
                             </div>
                         </div>
 
-                        <div style={styles.sectionContainer}>
-                            <h3 style={styles.sectionHeader}>Delivery Address</h3>
-                            <div style={styles.addressGrid}>
-                                <div style={{...styles.formGroup, ...styles.fullWidth}}><label>State</label><input type="text" name="state" value={formData.address.state} style={styles.input} readOnly /></div>
-                                <div style={{...styles.formGroup, ...styles.fullWidth}}><label>City</label><input type="text" name="city" value={formData.address.city} style={styles.input} readOnly /></div>
-                                <div style={styles.formGroup}><label>Locality*</label><input type="text" name="locality" value={formData.address.locality} onChange={handleChange} style={styles.input} required /></div>
-                                <div style={styles.formGroup}><label>Road*</label><input type="text" name="road" value={formData.address.road} onChange={handleChange} style={styles.input} required /></div>
-                                <div style={styles.formGroup}><label>Flat/House No. (Optional)</label><input type="text" name="flatNo" value={formData.address.flatNo} onChange={handleChange} style={styles.input} /></div>
-                                <div style={styles.formGroup}><label>Pincode*</label><input type="text" name="pincode" value={formData.address.pincode} onChange={handleChange} style={styles.input} required /></div>
-                                <div style={{...styles.formGroup, ...styles.fullWidth}}><label>Landmark (Optional)</label><input type="text" name="landmark" value={formData.address.landmark} onChange={handleChange} style={styles.input} /></div>
+                        <div className={styles.sectionContainer}>
+                            <h3 className={styles.sectionHeader}>Delivery Address</h3>
+                            <div className={styles.addressGrid}>
+                                <div className={`${styles.formGroup} ${styles.fullWidth}`}><label>State</label><input type="text" name="state" value={formData.address.state} className={styles.input} readOnly /></div>
+                                <div className={`${styles.formGroup} ${styles.fullWidth}`}><label>City</label><input type="text" name="city" value={formData.address.city} className={styles.input} readOnly /></div>
+                                <div className={styles.formGroup}><label>Locality*</label><input type="text" name="locality" value={formData.address.locality} onChange={handleChange} className={styles.input} required /></div>
+                                <div className={styles.formGroup}><label>Road*</label><input type="text" name="road" value={formData.address.road} onChange={handleChange} className={styles.input} required /></div>
+                                <div className={styles.formGroup}><label>Flat/House No.</label><input type="text" name="flatNo" value={formData.address.flatNo} onChange={handleChange} className={styles.input} /></div>
+                                <div className={styles.formGroup}><label>Pincode*</label><input type="text" name="pincode" value={formData.address.pincode} onChange={handleChange} className={styles.input} required /></div>
+                                <div className={`${styles.formGroup} ${styles.fullWidth}`}><label>Landmark</label><input type="text" name="landmark" value={formData.address.landmark} onChange={handleChange} className={styles.input} /></div>
                             </div>
                         </div>
 
-                        <div className="form-step"><label>Payment Method</label><p style={styles.codText}>Cash on Delivery (COD)</p></div>
-                        {error && <p className="error-message">{error}</p>}
-                        <button type="submit" disabled={loading || cartItems.length === 0} style={{ width: '100%', marginTop: '1rem' }}>
-                            {loading ? 'Placing Order...' : 'Place Order & Save Info'}
+                        <div className={formStyles.formStep}><label>Payment Method</label><p className={styles.codText}>Cash on Delivery (COD)</p></div>
+                        {error && <p className={formStyles.errorMessage}>{error}</p>}
+                        <button type="submit" disabled={loading || cartItems.length === 0} className={styles.placeOrderButton}>
+                            {loading ? 'Placing Order...' : 'Place Order'}
                         </button>
                     </form>
                 </div>
@@ -175,23 +157,5 @@ function Checkout() {
         </div>
     );
 }
-
-const styles = {
-    // Styles for Order Summary
-    orderSummary: { width: '100%', marginBottom: '2rem', marginRight:"5rem", padding: '1rem', backgroundColor: 'var(--input-background)', borderRadius: '8px', border: '1px solid var(--input-border)' },
-    item: { display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid var(--card-border)' },
-    totalLine: { borderBottom: 'none', marginTop: '0.5rem' },
-    itemName: { color: '#ccc' },
-    itemTotal: { fontWeight: '500' },
-
-    // Styles for Forms and Layout
-    sectionContainer: { marginBottom: '2rem', textAlign: 'left' },
-    sectionHeader: { marginBottom: '1rem', borderBottom: '1px solid var(--card-border)', paddingBottom: '0.5rem' },
-    addressGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' },
-    formGroup: { display: 'flex', flexDirection: 'column', marginBottom: '0.5rem' },
-    fullWidth: { gridColumn: '1 / -1' },
-    input: { padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--input-border)', backgroundColor: 'var(--input-background)', color: 'var(--text-color)', fontSize: '1rem', marginTop: '0.25rem' },
-    codText: { margin: 0, padding: '0.85rem', backgroundColor: 'var(--card-background)', borderRadius: '8px' },
-};
 
 export default Checkout;

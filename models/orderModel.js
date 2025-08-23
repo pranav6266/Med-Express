@@ -1,5 +1,3 @@
-// models/orderModel.js
-
 import mongoose from 'mongoose';
 
 const orderItemSchema = new mongoose.Schema({
@@ -24,9 +22,6 @@ const orderSchema = new mongoose.Schema({
         ref: 'User', // Refers to a user with the 'agent' role
         default: null,
     },
-    // --- KEY CHANGE ---
-    // The fulfillmentStore is now required because the user must select
-    // a store before they can place an order. The 'default: null' is removed.
     fulfillmentStore: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Store',

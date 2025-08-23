@@ -1,10 +1,24 @@
 // src/pages/LandingPage.jsx
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './LandingPage.module.css';
+import ThemeToggle from '../components/ThemeToggle.jsx'; // <-- Import ThemeToggle
 
 function LandingPage() {
+
+    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
+
+    const toggleTheme = () => {
+        const newTheme = theme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+    };
+
+    useEffect(() => {
+        document.body.setAttribute('data-theme', theme);
+    }, [theme]);
+
     return (
         <div className={styles.pageWrapper}>
             <header className={styles.header}>
@@ -12,6 +26,7 @@ function LandingPage() {
                     MedExpress
                 </div>
                 <nav className={styles.nav}>
+                    <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
                     <Link to="/login" className={`${styles.navButton} ${styles.loginButton}`}>Login</Link>
                     <Link to="/signup" className={`${styles.navButton} ${styles.signupButton}`}>Sign Up</Link>
                 </nav>

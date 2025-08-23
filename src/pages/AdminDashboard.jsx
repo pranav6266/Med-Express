@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import Header from '../components/Header';
 import OrderManagement from '../components/admin/OrderManagement';
 import InventoryManagement from '../components/admin/InventoryManagement';
-import MedicineManagement from '../components/admin/MedicineManagement'; // <-- Import the new component
+import MedicineManagement from '../components/admin/MedicineManagement';
 
 function AdminDashboard() {
-    const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'inventory', or 'medicines'
+    const [activeTab, setActiveTab] = useState('orders');
 
     const renderContent = () => {
         switch (activeTab) {
@@ -58,7 +58,6 @@ function AdminDashboard() {
 }
 
 const styles = {
-    // Styles are unchanged...
     container: { padding: '0 2rem' },
     title: { textAlign: 'center', marginBottom: '1rem' },
     tabs: { display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem' },

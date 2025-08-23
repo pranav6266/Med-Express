@@ -1,5 +1,3 @@
-// src/components/Header.jsx
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
@@ -7,7 +5,6 @@ import ThemeToggle from './ThemeToggle.jsx';
 import styles from './Header.module.css'; // Import the new CSS Module
 
 function Header() {
-    // ... (logic remains the same)
     const navigate = useNavigate();
     const location = useLocation();
     const { toggleCart, cartItems } = useCart();

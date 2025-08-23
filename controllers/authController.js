@@ -1,5 +1,3 @@
-// controllers/authController.js
-
 import crypto from 'crypto';
 import User from '../models/userModel.js';
 import generateToken from '../utils/generateToken.js';

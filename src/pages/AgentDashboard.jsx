@@ -10,7 +10,7 @@ function AgentDashboard() {
     const [error, setError] = useState('');
     const [activeTab, setActiveTab] = useState('active');
 
-    // ... (fetchAssignedOrders and handleStatusUpdate logic remains the same)
+
     const fetchAssignedOrders = async () => {
         try {
             setLoading(true);

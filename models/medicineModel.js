@@ -1,5 +1,3 @@
-// models/medicineModel.js
-
 import mongoose from 'mongoose';
 
 const medicineSchema = new mongoose.Schema({
@@ -17,7 +15,6 @@ const medicineSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    // REPLACED 'stock' with a store-based inventory system
     inventory: [{
         storeId: {
             type: mongoose.Schema.Types.ObjectId,

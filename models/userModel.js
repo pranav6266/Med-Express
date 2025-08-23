@@ -1,10 +1,7 @@
-// models/userModel.js
-
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
-// --- NEW: A sub-schema for a structured address ---
 const addressSchema = new mongoose.Schema({
     flatNo: { type: String, default: '' },
     road: { type: String, default: '' },
@@ -38,10 +35,9 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'agent', 'admin'],
         default: 'user',
     },
-    // --- UPDATED: Address is now a structured object ---
+
     address: addressSchema,
 
-    // --- NEW: Fields for phone and avatar ---
     phone: {
         type: String,
         default: ''

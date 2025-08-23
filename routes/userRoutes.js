@@ -1,5 +1,3 @@
-// routes/userRoutes.js
-
 import express from 'express';
 import {
     getMedicines,
@@ -14,15 +12,18 @@ import {
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
-
+/**
 // @desc    Fetch all medicines
 // @route   GET /api/users/medicines
 // @access  Public
+    */
 router.get('/medicines', getMedicines);
 
+/**
 // @desc    Place a new order
 // @route   POST /api/users/orders
 // @access  Private (User)
+*/
 router.post('/orders', protect, authorize('user'), placeOrder);
 
 /**

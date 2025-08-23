@@ -1,5 +1,3 @@
-// routes/adminRoutes.js
-
 import express from 'express';
 import {
     createMedicine,
@@ -9,7 +7,7 @@ import {
     getAllOrders, updateStock, getAllMedicinesAdmin, getAllAgents,
 } from '../controllers/adminController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
-import upload from '../middleware/uploadMiddleware.js'; // Import uploads middleware
+import upload from '../middleware/uploadMiddleware.js';
 
 const router = express.Router();
 

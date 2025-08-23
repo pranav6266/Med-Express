@@ -1,12 +1,11 @@
-// src/App.jsx
-
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './context/CartContext.jsx';
-import CartPanel from './components/CartPanel.jsx';
+import './App.css';
 
-// Import all your pages and components
-import LandingPage from './pages/LandingPage.jsx'; // <-- IMPORT THE NEW PAGE
+
+// Importing all components
+import LandingPage from './pages/LandingPage.jsx';
 import Signup from './pages/Signup.jsx';
 import Login from './pages/Login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
@@ -18,13 +17,12 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AgentRoute from './components/AgentRoute';
 import AdminRoute from './components/AdminRoute';
 import Profile from './pages/Profile.jsx';
+import CartPanel from './components/CartPanel.jsx';
 
-import './App.css';
 
-// AppContent remains mostly the same
+
 function AppContent() {
-    // Note: The theme logic can be removed from here if each page now handles its own theme,
-    // or it can be kept as a global fallback. For simplicity, we assume it's kept.
+    // Setting the theme
     const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
 
     useEffect(() => {
@@ -35,8 +33,8 @@ function AppContent() {
         <>
             <div>
                 <Routes>
-                    {/* --- UPDATED ROUTES --- */}
-                    <Route path="/" element={<LandingPage />} /> {/* <-- New landing page route */}
+                    {/*Routes which all users can access without authorization.*/}
+                    <Route path="/" element={<LandingPage />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
 
@@ -59,7 +57,6 @@ function AppContent() {
                     </Route>
                 </Routes>
             </div>
-            {/* CartPanel will only appear on pages where CartProvider is active */}
             <CartPanel />
         </>
     );

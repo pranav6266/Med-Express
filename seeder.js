@@ -1,13 +1,10 @@
-// seeder.js
-
+//  Using this file to inject dummy data into the db.
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-// Data needs to be imported before models that use it
 import { users, medicines, stores } from './data/dummyData.js';
 
-// --- CORRECTED IMPORT ORDER ---
-// Import parent models BEFORE models that reference them
-import Store from './models/storeModel.js'; // <-- IMPORT STORE FIRST
+// Importing all models of DB
+import Store from './models/storeModel.js';
 import User from './models/userModel.js';
 import Medicine from './models/medicineModel.js';
 import Order from './models/orderModel.js';
@@ -35,13 +32,13 @@ const importData = async () => {
 
         console.log('Cleared existing data.');
 
-        // --- Step 1: Create Users ---
+        // --- Creating Users ---
         const createdUsers = await User.insertMany(users);
         const agentUser = createdUsers.find(u => u.role === 'agent');
         const normalUser = createdUsers.find(u => u.role === 'user');
         console.log('Users Imported!');
 
-        // --- Step 2: Create Stores ---
+        // --- Creating Stores ---
         const createdStores = await Store.insertMany(stores);
         console.log('Stores Imported!');
 
@@ -57,7 +54,7 @@ const importData = async () => {
         const createdMedicines = await Medicine.insertMany(medicinesWithInventory);
         console.log('Medicines with Inventory Imported!');
 
-        // --- Step 4: Create Dummy Orders ---
+        // --- Step 4: Creating Orders ---
         const sampleOrders = [];
         for (let i = 0; i < 20; i++) {
             const orderItems = [];

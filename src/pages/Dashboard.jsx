@@ -14,7 +14,6 @@ const medicineKeywords = {
 };
 
 function Dashboard() {
-    // ... (All state and logic hooks remain the same)
     const [allMedicines, setAllMedicines] = useState([]);
     const [filteredMedicines, setFilteredMedicines] = useState([]);
     const [stores, setStores] = useState([]);
@@ -25,7 +24,7 @@ function Dashboard() {
     const { addToCart, selectedStore, setSelectedStore } = useCart();
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
-    // ... (All useEffect hooks and handlers remain the same)
+
     useEffect(() => {
         const fetchStores = async () => {
             try {
