@@ -5,6 +5,9 @@ import {
     getMedicines,
     placeOrder,
     getMyOrders,
+    addToCart,
+    getCart,
+    removeFromCart
 } from '../controllers/userController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
@@ -20,9 +23,19 @@ router.get('/medicines', getMedicines);
 // @access  Private (User)
 router.post('/orders', protect, authorize('user'), placeOrder);
 
-// @desc    Get logged in user's orders
-// @route   GET /api/users/orders/my
-// @access  Private (User)
+/**
+* @desc    Get logged in user's orders
+* @route   GET /api/users/orders/my
+* @access  Private (User)
+*/
 router.get('/orders/my', protect, authorize('user'), getMyOrders);
+
+router.route('/cart')
+    .get(protect, authorize('user'), getCart)
+    .post(protect, authorize('user'), addToCart);
+
+router.delete('/cart/:medicineId', protect, authorize('user'), removeFromCart);
+
+
 
 export default router;

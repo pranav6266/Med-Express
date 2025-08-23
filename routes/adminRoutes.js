@@ -9,7 +9,7 @@ import {
     getAllOrders,
 } from '../controllers/adminController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
-import upload from '../middleware/uploadMiddleware.js'; // Import upload middleware
+import upload from '../middleware/uploadMiddleware.js'; // Import uploads middleware
 
 const router = express.Router();
 

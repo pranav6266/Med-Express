@@ -29,8 +29,24 @@ const userSchema = new mongoose.Schema({
     address: {
         type: String,
         trim: true,
-    }
-}, {
+    },
+    cart: [
+        {
+            medicine: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Medicine',
+                required: true,
+            },
+            quantity: {
+                type: Number,
+                required: true,
+                default: 1,
+            },
+        },
+    ],
+},
+
+    {
     timestamps: true // Adds createdAt and updatedAt timestamps
 });
 

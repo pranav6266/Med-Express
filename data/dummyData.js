@@ -23,7 +23,7 @@ export const users = [
 ];
 
 export const medicines = [
-    { name: 'Paracetamol 500mg', description: 'For fever and pain relief', price: 1.50, stock: 100, imageUrl: "./public/medicine-images/paracetamol.jpeg" },
+    { name: 'Paracetamol 500mg', description: 'For fever and pain relief', price: 1.50, stock: 100},
     { name: 'Ibuprofen 200mg', description: 'Anti-inflammatory and pain relief', price: 2.75, stock: 80 },
     { name: 'Aspirin 75mg', description: 'Blood thinner, for heart conditions', price: 3.20, stock: 120 },
     { name: 'Loratadine 10mg', description: 'Antihistamine for allergies', price: 5.50, stock: 60 },
