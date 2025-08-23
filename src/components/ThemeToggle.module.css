@@ -1,0 +1,47 @@
+/* src/components/ThemeToggle.module.css */
+.themeToggleButton {
+    background: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    position: relative;
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    border-radius: 50%;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.themeToggleButton:hover {
+    background-color: var(--surface-border);
+}
+
+.themeToggleButton svg {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    transition: transform 0.4s ease-out, opacity 0.3s ease-out;
+}
+
+/* Dark Theme State (default) */
+.sun {
+    opacity: 0;
+    transform: rotate(45deg);
+}
+.moon {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+
+/* Light Theme State */
+.light .sun {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+.light .moon {
+    opacity: 0;
+    transform: rotate(-45deg);
+}

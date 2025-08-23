@@ -1,0 +1,184 @@
+/* src/components/Header.module.css */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 2rem;
+    background-color: var(--surface-background);
+    backdrop-filter: blur(10px);
+    color: var(--text-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--surface-border);
+}
+
+.headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+.logoContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    font-size: 1.7rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: var(--text-color);
+}
+
+.tagline {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: -5px;
+}
+
+.navigation {
+    display: flex;
+    gap: 2rem;
+}
+
+.roleIdentifier {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    border: 1px solid var(--surface-border);
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+}
+
+.navLink {
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 1rem;
+    padding-bottom: 0.5rem;
+    position: relative;
+    transition: color 0.3s;
+}
+
+.navLink::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--primary-color);
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+}
+
+.navLink:hover {
+    color: var(--primary-hover);
+}
+
+.navLink:hover::after,
+.activeNavLink::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+.activeNavLink {
+    color: var(--primary-color);
+}
+
+.headerRight {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.cartIconContainer {
+    position: relative;
+    cursor: pointer;
+    font-size: 1.8rem;
+    color: var(--text-color);
+    padding: 0.5rem;
+}
+
+.cartBadge {
+    position: absolute;
+    top: 0px;
+    right: -2px;
+    background: var(--glow-color);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.profileContainer {
+    position: relative;
+}
+
+.avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid var(--primary-color);
+    object-fit: cover;
+}
+
+.dropdownMenu {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background-color: var(--background-start);
+    border: 1px solid var(--surface-border);
+    border-radius: 12px;
+    padding: 0.5rem;
+    z-index: 20;
+    width: 220px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    animation: fadeInUp 0.2s ease-out;
+}
+
+.dropdownHeader {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--surface-border);
+    margin-bottom: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.dropdownLink {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    color: var(--text-color);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.dropdownLink:hover {
+    background-color: var(--surface-background);
+}
+
+.dropdownDivider {
+    height: 1px;
+    background-color: var(--surface-border);
+    margin: 0.5rem 0;
+}
+
+.logoutButton {
+    color: #ff8a8a;
+}

@@ -1,0 +1,135 @@
+/* src/pages/AgentDashboard.module.css */
+.container {
+    padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+}
+
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--surface-border);
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 12px;
+    padding: 0.5rem;
+    background-color: var(--input-background);
+}
+
+.tabButton {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    color: var(--text-muted);
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.tabButton:hover {
+    background-color: var(--surface-background);
+    color: var(--text-color);
+}
+
+.activeTabButton {
+    composes: tabButton;
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.orderCard {
+    background-color: var(--surface-background);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--surface-border);
+    margin-bottom: 1.5rem;
+    animation: fadeInUp 0.4s ease-out;
+    transition: box-shadow 0.3s;
+}
+
+.orderCard:hover {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+    font-family: 'monospace';
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.9rem;
+    font-family: var(--font-family);
+    font-weight: 500;
+}
+
+/* Status badge colors */
+.accepted { background-color: #5bc0de; }
+.pickedup { background-color: #337ab7; }
+.delivered { background-color: #5cb85c; }
+.cancelled { background-color: #d9534f; }
+
+.addressGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.addressBlock {
+    padding-left: 1rem;
+    border-left: 3px solid var(--primary-color);
+}
+
+.addressBlock strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+
+.addressBlock p {
+    margin: 0 0 0.25rem 0;
+    font-weight: 500;
+}
+
+.addressBlock small {
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.actionButton {
+    width: 100%;
+    padding: 0.85rem;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.prompt {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+}
+
+.errorMessage {
+    color: #ff6b6b;
+    text-align: center;
+}

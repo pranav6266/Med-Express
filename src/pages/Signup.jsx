@@ -3,19 +3,15 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import styles from './AuthForm.module.css'; // Re-use the same CSS Module
 
 function Signup() {
     const [step, setStep] = useState(0);
-    const [form, setForm] = useState({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        role: '', // Role is now selected by the user
-    });
+    const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', role: '' });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
 
+    // ... (handleSignUp, handleChange, handleRoleSelect, nextStep, prevStep logic remains the same)
     const handleSignUp = async (e) => {
         e.preventDefault();
         setError('');
@@ -39,13 +35,12 @@ function Signup() {
 
     const handleRoleSelect = (selectedRole) => {
         setForm({ ...form, role: selectedRole });
-        nextStep(); // Automatically move to the next step after role selection
+        nextStep();
     };
 
     const nextStep = () => setStep(step + 1);
     const prevStep = () => setStep(step - 1);
 
-    // Added 'role' as the first step
     const steps = [
         { name: 'role', type: 'selection', label: 'I want to sign up as a...' },
         { name: 'name', type: 'text', label: 'Name' },
@@ -65,8 +60,8 @@ function Signup() {
 
     if (success) {
         return (
-            <div className="form-container">
-                <div className="form-card">
+            <div className={styles.formContainer}>
+                <div className={styles.formCard}>
                     <h2>Signup Successful!</h2>
                     <p>You can now log in.</p>
                     <Link to="/login">
@@ -78,48 +73,41 @@ function Signup() {
     }
 
     return (
-        <div className="form-container">
-            <div className="form-card">
+        <div className={styles.formContainer}>
+            <div className={styles.formCard}>
                 <h2>Signup</h2>
                 <form onSubmit={handleSignUp}>
-                    <div className="form-content">
-                        <div className="form-step">
-                            <label>{steps[step].label}</label>
-                            {/* Conditional rendering for the role selection step */}
-                            {steps[step].type === 'selection' ? (
-                                <div className="button-group" style={{ marginTop: '1rem' }}>
-                                    <button type="button" onClick={() => handleRoleSelect('user')}>User</button>
-                                    <button type="button" onClick={() => handleRoleSelect('agent')}>Delivery Agent</button>
-                                </div>
-                            ) : (
-                                <input
-                                    type={steps[step].type}
-                                    name={steps[step].name}
-                                    placeholder={`Enter your ${steps[step].name.replace('Password', ' password')}`}
-                                    value={form[steps[step].name]}
-                                    onChange={handleChange}
-                                    onKeyDown={step < steps.length - 1 ? handleKeyDown : undefined}
-                                    autoFocus
-                                />
-                            )}
-                        </div>
+                    <div className={styles.formStep}>
+                        <label>{steps[step].label}</label>
+                        {steps[step].type === 'selection' ? (
+                            <div className={styles.buttonGroup} style={{ marginTop: '1rem' }}>
+                                <button type="button" onClick={() => handleRoleSelect('user')}>User</button>
+                                <button type="button" onClick={() => handleRoleSelect('agent')}>Delivery Agent</button>
+                            </div>
+                        ) : (
+                            <input
+                                type={steps[step].type}
+                                name={steps[step].name}
+                                placeholder={`Enter your ${steps[step].name.replace('Password', ' password')}`}
+                                value={form[steps[step].name]}
+                                onChange={handleChange}
+                                onKeyDown={step < steps.length - 1 ? handleKeyDown : undefined}
+                                autoFocus
+                            />
+                        )}
                     </div>
-
-                    <div className="button-group">
+                    <div className={styles.buttonGroup}>
                         {step > 0 && <button type="button" onClick={prevStep}>Back</button>}
-                        {/* Hide 'Next' button on role selection, show on other steps */}
                         {step > 0 && step < steps.length - 1 && (
                             <button type="button" onClick={nextStep} disabled={!form[steps[step].name]}>Next</button>
                         )}
-                        {/* Show 'Finish' button only on the last step */}
                         {step === steps.length - 1 && (
                             <button type="submit" disabled={!form.password || !form.confirmPassword}>Finish</button>
                         )}
                     </div>
                 </form>
-                {error && <p className="error-message">{error}</p>}
-
-                <p className="switch-form-link">
+                {error && <p className={styles.errorMessage}>{error}</p>}
+                <p className={styles.switchFormLink}>
                     Already have an account? <Link to="/login">Log In</Link>
                 </p>
             </div>

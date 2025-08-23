@@ -1,0 +1,82 @@
+/* src/pages/AuthForm.module.css */
+.formContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1rem;
+}
+
+.formCard {
+    background-color: var(--surface-background);
+    backdrop-filter: blur(10px);
+    padding: 2.5rem 3rem;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    text-align: center;
+    border: 1px solid var(--surface-border);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.formCard h2 {
+    margin-top: 0;
+    margin-bottom: 2rem;
+    font-size: 2.2em;
+}
+
+.formStep {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.formStep label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.formStep input {
+    width: 100%;
+    padding: 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-background);
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.formStep input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(83, 91, 242, 0.3);
+}
+
+.buttonGroup {
+    display: flex;
+    justify-content: space-around;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.buttonGroup button {
+    flex: 1;
+}
+
+.errorMessage {
+    color: #ff6b6b;
+    margin-top: 1rem;
+}
+
+.switchFormLink {
+    margin-top: 1.5rem;
+    color: var(--text-muted);
+}
+
+.switchFormLink a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}

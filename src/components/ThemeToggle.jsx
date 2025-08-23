@@ -1,14 +1,20 @@
+// src/components/ThemeToggle.jsx
+
 import React from 'react';
+import styles from './ThemeToggle.module.css';
 
 function ThemeToggle({ theme, toggleTheme }) {
+    // Add the 'light' class when the theme is light
+    const buttonClass = `${styles.themeToggleButton} ${theme === 'light' ? styles.light : ''}`;
+
     return (
         <button
             onClick={toggleTheme}
-            className={`theme-toggle-button ${theme}`}
+            className={buttonClass}
             aria-label="Toggle theme"
         >
             {/* Sun Icon */}
-            <svg className="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className={styles.sun} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="5"></circle>
                 <line x1="12" y1="1" x2="12" y2="3"></line>
                 <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -20,7 +26,7 @@ function ThemeToggle({ theme, toggleTheme }) {
                 <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
             </svg>
             {/* Moon Icon */}
-            <svg className="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className={styles.moon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
         </button>

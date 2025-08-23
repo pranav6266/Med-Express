@@ -1,28 +1,32 @@
-/* Define color variables for both themes */
+/* src/index.css */
 :root {
-    --font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    --font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
     --background-start: #1a1a2e;
     --background-end: #16213e;
-    --card-background: rgba(47, 47, 47, 0.75);
-    --card-border: #0f3460;
+    --surface-background: rgba(23, 33, 62, 0.8); /* A semi-transparent surface color */
+    --surface-border: rgba(233, 69, 96, 0.2);
     --glow-color: #e94560;
     --text-color: #e0e0e0;
+    --text-muted: #8b949e;
     --primary-color: #535bf2;
-    --input-background: #333;
-    --input-border: #555;
+    --primary-hover: #646cff;
+    --input-background: rgba(15, 23, 42, 0.7);
+    --input-border: #30363d;
     --button-text: #ffffff;
 }
 
 [data-theme='light'] {
-    --background-start: #decde2;
-    --background-end: #c5c2f7;
-    --card-background: rgba(255, 255, 255, 0.75);
-    --card-border: #a49ed4;
+    --background-start: #f0f2f5;
+    --background-end: #e6e9ee;
+    --surface-background: rgba(255, 255, 255, 0.9);
+    --surface-border: #d0d7de;
     --glow-color: #747bff;
     --text-color: #213547;
+    --text-muted: #57606a;
     --primary-color: #646cff;
-    --input-background: #f0f0f0;
-    --input-border: #ccc;
+    --primary-hover: #747bff;
+    --input-background: #f6f8fa;
+    --input-border: #d0d7de;
     --button-text: #ffffff;
 }
 
@@ -31,9 +35,11 @@ body {
     font-family: var(--font-family);
     color: var(--text-color);
     background: linear-gradient(45deg, var(--background-start), var(--background-end));
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
+    background-size: 200% 200%;
+    animation: gradientBG 20s ease infinite;
     transition: color 0.3s, background-color 0.3s;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 @keyframes gradientBG {
@@ -41,82 +47,17 @@ body {
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
+
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(15px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.form-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
+* {
+    box-sizing: border-box;
 }
 
-.form-card {
-    background-color: var(--card-background);
-    backdrop-filter: blur(10px);
-    padding: 2.5rem 3rem;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 480px; /* Increased size */
-    text-align: center;
-    border: 1px solid var(--card-border);
-    box-shadow: 0 0 15px var(--glow-color), 0 0 30px var(--glow-color);
-    animation: glow 5s linear infinite;
-    transition: box-shadow 0.3s, background-color 0.3s, border 0.3s;
-}
-
-@keyframes glow {
-    0% { box-shadow: 0 0 10px var(--glow-color); }
-    50% { box-shadow: 0 0 30px var(--glow-color); }
-    100% { box-shadow: 0 0 10px var(--glow-color); }
-}
-
-
-.form-card h2 {
-    margin-top: 0;
-    margin-bottom: 2rem;
-    font-size: 2.2em;
-}
-
-.form-content {
-    margin-bottom: 2rem;
-}
-
-.form-step {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-}
-
-.form-step label {
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-    color: var(--text-color);
-}
-
-.form-step input {
-    padding: 0.85rem;
-    border-radius: 8px;
-    border: 1px solid var(--input-border);
-    background-color: var(--input-background);
-    color: var(--text-color);
-    font-size: 1rem;
-    transition: border-color 0.25s;
-}
-
-.form-step input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-}
-
+/* Base button style */
 button {
     border-radius: 8px;
     border: 1px solid transparent;
@@ -127,116 +68,18 @@ button {
     background-color: var(--primary-color);
     color: var(--button-text);
     cursor: pointer;
-    transition: border-color 0.25s, background-color 0.25s;
+    transition: all 0.25s;
 }
 
 button:hover {
-    background-color: #535bf2;
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 button:disabled {
     background-color: #555;
     cursor: not-allowed;
-}
-
-.button-group {
-    display: flex;
-    justify-content: space-around;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.error-message {
-    color: #ff6b6b;
-    margin-top: 1rem;
-}
-
-.switch-form-link {
-    margin-top: 1.5rem;
-    color: #aaa;
-}
-
-.switch-form-link a {
-    color: var(--primary-color);
-    text-decoration: none;
-}
-
-/* --- REPLACE THE OLD THEME TOGGLE STYLES WITH THIS --- */
-.theme-toggle-button {
-    background: none;
-    border: 1px solid transparent;
-    cursor: pointer;
-    position: relative;
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-color);
-}
-
-.theme-toggle-button svg {
-    position: absolute;
-    width: 22px;
-    height: 22px;
-    transition: transform 0.4s ease-out, opacity 0.3s ease-out;
-}
-
-/* Dark Theme State (default) */
-.theme-toggle-button .sun {
-    opacity: 0;
-    transform: rotate(45deg);
-}
-.theme-toggle-button .moon {
-    opacity: 1;
-    transform: rotate(0deg);
-}
-
-/* Light Theme State */
-.theme-toggle-button.light .sun {
-    opacity: 1;
-    transform: rotate(0deg);
-}
-.theme-toggle-button.light .moon {
-    opacity: 0;
-    transform: rotate(-45deg);
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #444;
-    transition: .4s;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-}
-
-input:checked + .slider {
-    background-color: var(--primary-color);
-}
-
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-
-.slider.round {
-    border-radius: 34px;
-}
-
-.slider.round:before {
-    border-radius: 50%;
+    transform: none;
+    box-shadow: none;
 }
