@@ -1,0 +1,46 @@
+/* src/components/orders/TrackPackageModal.module.css */
+.body {
+    padding-top: 1rem;
+}
+
+.timeline {
+    border-left: 2px solid var(--primary-color);
+    padding: 1rem 0 1rem 1.5rem;
+    position: relative;
+    margin-top: 1rem;
+}
+
+.timelineItem {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.timelineItem:last-child {
+    margin-bottom: 0;
+}
+
+.timelineDot {
+    position: absolute;
+    left: -22px;
+    top: 5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    border: 3px solid var(--surface-background);
+}
+
+.eventStatus {
+    margin: 0;
+    font-weight: bold;
+}
+
+.eventLocation {
+    margin: 0.25rem 0;
+    color: var(--text-muted);
+}
+
+.eventTime {
+    color: #aaa;
+    font-size: 0.85rem;
+}

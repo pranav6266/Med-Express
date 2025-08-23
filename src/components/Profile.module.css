@@ -1,0 +1,123 @@
+/* src/pages/Profile.module.css */
+.avatarSection {
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.currentAvatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid var(--primary-color);
+    object-fit: cover;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+
+.avatarMenu {
+    position: absolute;
+    top: 160px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--surface-background);
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    padding: 1rem;
+    z-index: 10;
+    width: calc(100% - 2rem);
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.menuTitle {
+    margin: 0 0 1rem 0;
+    font-weight: bold;
+}
+
+.avatarOptions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.avatarOption {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.2s;
+}
+
+.avatarOption:hover {
+    transform: scale(1.1);
+}
+
+.removeButton {
+    margin-top: 1rem;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.sectionContainer {
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.sectionHeader {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--surface-border);
+    padding-bottom: 0.5rem;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.input {
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-background);
+    color: var(--text-color);
+    font-size: 1rem;
+    margin-top: 0.25rem;
+}
+
+.changePasswordButton {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    background-color: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    cursor: pointer;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+}
+
+.saveButton {
+    flex: 1;
+}
+
+.closeButton {
+    flex: 1;
+    background-color: #6c757d;
+}

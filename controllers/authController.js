@@ -4,6 +4,25 @@ import crypto from 'crypto';
 import User from '../models/userModel.js';
 import generateToken from '../utils/generateToken.js';
 
+// --- ADD THIS NEW FUNCTION ---
+/**
+ * @desc    Check if an email already exists
+ * @route   POST /api/auth/check-email
+ * @access  Public
+ */
+export const checkEmail = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ message: 'Email is required' });
+        }
+        const user = await User.findOne({ email });
+        res.status(200).json({ exists: !!user });
+    } catch (error) {
+        next(error);
+    }
+};
+
 // --- User Registration ---
 export const registerUser = async (req, res, next) => {
     const { name, email, password, role } = req.body;

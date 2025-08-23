@@ -18,6 +18,14 @@
     border: 1px solid var(--surface-border);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     animation: fadeInUp 0.5s ease-out;
+    position: relative; /* Added for positioning children */
+}
+
+/* --- NEW: Theme Toggle Container --- */
+.themeToggleContainer {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
 }
 
 .formCard h2 {
@@ -27,8 +35,27 @@
 }
 
 .formStep {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem; /* Adjusted margin */
     text-align: left;
+}
+
+/* --- NEW: Password Input Wrapper --- */
+.passwordWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* --- NEW: Show Password Icon --- */
+.passwordIcon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    user-select: none; /* Prevents text selection on double click */
+    font-size: 1.2rem;
+    color: var(--text-muted);
 }
 
 .formStep label {
@@ -40,6 +67,8 @@
 .formStep input {
     width: 100%;
     padding: 0.85rem;
+    /* Add extra padding on the right for the icon */
+    padding-right: 3rem;
     border-radius: 8px;
     border: 1px solid var(--input-border);
     background-color: var(--input-background);
@@ -48,10 +77,36 @@
     transition: border-color 0.25s, box-shadow 0.25s;
 }
 
+/* Adjust input padding when it's not a password field */
+.formStep input:not([type="password"]):not([type="text"]) {
+    padding-right: 0.85rem;
+}
+
 .formStep input:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(83, 91, 242, 0.3);
+}
+
+.feedbackMessage {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    padding-left: 0.2rem;
+    font-weight: 500;
+}
+
+.feedbackMessage.checking {
+    color: var(--text-muted);
+}
+
+.feedbackMessage.error {
+    color: #ff8a8a;
+    margin-top: 0.5rem; /* Add margin to separate from input */
+}
+
+
+.feedbackMessage.success {
+    color: #5cb85c;
 }
 
 .buttonGroup {

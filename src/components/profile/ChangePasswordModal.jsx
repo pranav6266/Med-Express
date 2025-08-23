@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import modalStyles from '../Modal.module.css';
+import styles from './ChangePasswordModal.module.css';
 
 function ChangePasswordModal({ onClose }) {
     const [passwords, setPasswords] = useState({
@@ -28,12 +30,10 @@ function ChangePasswordModal({ onClose }) {
 
         setLoading(true);
         setMessage('');
-
         try {
             const userInfo = JSON.parse(localStorage.getItem('userInfo'));
             const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
             const body = { oldPassword: passwords.oldPassword, newPassword: passwords.newPassword };
-
             const { data } = await axios.put('/api/users/profile/changepassword', body, config);
             setMessage(data.message);
             // Close modal after a short delay on success
@@ -48,25 +48,25 @@ function ChangePasswordModal({ onClose }) {
     };
 
     return (
-        <div style={styles.modalOverlay}>
-            <div style={styles.modalContent}>
+        <div className={modalStyles.modalOverlay}>
+            <div className={modalStyles.modalContent}>
                 <h2>Change Password</h2>
                 <form onSubmit={handleSubmit}>
-                    <div style={styles.formGroup}>
+                    <div className={styles.formGroup}>
                         <label>Old Password</label>
-                        <input type="password" name="oldPassword" value={passwords.oldPassword} onChange={handleChange} style={styles.input} required />
+                        <input type="password" name="oldPassword" value={passwords.oldPassword} onChange={handleChange} className={styles.input} required />
                     </div>
-                    <div style={styles.formGroup}>
+                    <div className={styles.formGroup}>
                         <label>New Password</label>
-                        <input type="password" name="newPassword" value={passwords.newPassword} onChange={handleChange} style={styles.input} required />
+                        <input type="password" name="newPassword" value={passwords.newPassword} onChange={handleChange} className={styles.input} required />
                     </div>
-                    <div style={styles.formGroup}>
+                    <div className={styles.formGroup}>
                         <label>Confirm New Password</label>
-                        <input type="password" name="confirmPassword" value={passwords.confirmPassword} onChange={handleChange} style={styles.input} required />
+                        <input type="password" name="confirmPassword" value={passwords.confirmPassword} onChange={handleChange} className={styles.input} required />
                     </div>
                     {message && <p style={{textAlign: 'center', margin: '1rem 0'}}>{message}</p>}
-                    <div style={styles.buttonGroup}>
-                        <button type="button" onClick={onClose} style={styles.cancelButton}>Cancel</button>
+                    <div className={styles.buttonGroup}>
+                        <button type="button" onClick={onClose} className={styles.cancelButton}>Cancel</button>
                         <button type="submit" disabled={loading}>{loading ? 'Saving...' : 'Save Password'}</button>
                     </div>
                 </form>
@@ -74,15 +74,5 @@ function ChangePasswordModal({ onClose }) {
         </div>
     );
 }
-
-const styles = {
-    modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 },
-    modalContent: { backgroundColor: 'var(--card-background)', padding: '2rem', borderRadius: '12px', width: '90%', maxWidth: '500px' },
-    formGroup: { marginBottom: '1.25rem' },
-    input: { width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--input-border)', backgroundColor: 'var(--input-background)', color: 'var(--text-color)', fontSize: '1rem', marginTop: '0.25rem' },
-    buttonGroup: { display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' },
-    cancelButton: { backgroundColor: '#6c757d' }
-};
-
 
 export default ChangePasswordModal;

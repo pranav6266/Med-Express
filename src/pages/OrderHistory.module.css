@@ -1,0 +1,91 @@
+/* src/pages/OrderHistory.module.css */
+.container {
+    padding: 0 2rem;
+}
+
+.pageHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto 2rem auto;
+    max-width: 800px;
+}
+
+.title {
+    margin: 0;
+}
+
+.filterDropdown {
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-background);
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.orderList {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 800px;
+    margin: auto;
+}
+
+.orderCard {
+    background-color: var(--surface-background);
+    border-radius: 12px;
+    border: 1px solid var(--surface-border);
+    overflow: hidden;
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background-color: var(--input-background);
+}
+
+.orderIdLabel {
+    font-size: 0.8rem;
+    color: #aaa;
+    display: block;
+}
+
+.orderId {
+    font-weight: bold;
+}
+
+.cardBody {
+    padding: 1.5rem;
+}
+
+.cardFooter {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--surface-border);
+    text-align: right;
+}
+
+.detailsButton {
+    padding: 0.5rem 1.5rem;
+    cursor: pointer;
+}
+
+.status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.status.pending { background-color: #f0ad4e; }
+.status.accepted { background-color: #5bc0de; }
+.status.pickedup { background-color: #337ab7; }
+.status.delivered { background-color: #5cb85c; }
+.status.cancelled { background-color: #d9534f; }
+
+.errorMessage {
+    color: #ff6b6b;
+    text-align: center;
+}

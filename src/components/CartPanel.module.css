@@ -1,0 +1,171 @@
+/* src/components/CartPanel.module.css */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1040;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.panel {
+    position: fixed;
+    top: 0;
+    height: 100%;
+    width: 400px;
+    background-color: var(--surface-background);
+    z-index: 1050;
+    transition: right 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    border-left: 1px solid var(--surface-border);
+}
+
+.header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--surface-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.closeButton {
+    background: var(--input-background);
+    border: 1px solid var(--surface-border);
+    cursor: pointer;
+    color: var(--text-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(180deg);
+}
+
+.closeButton:hover {
+    background-color: var(--surface-border);
+}
+
+.body {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.emptyCart {
+    text-align: center;
+    margin-top: 40%;
+    color: var(--text-muted);
+}
+
+.item {
+    display: flex;
+    margin-bottom: 1.5rem;
+    align-items: center;
+    background-color: var(--input-background);
+    padding: 1rem;
+    border-radius: 12px;
+}
+
+.itemImage {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 1rem;
+    border: 1px solid var(--surface-border);
+}
+
+.itemDetails {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.itemName {
+    font-weight: bold;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.quantityControl {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.quantityButton {
+    background: var(--surface-background);
+    border: 1px solid var(--surface-border);
+    color: var(--text-color);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0;
+}
+
+.quantityDisplay {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.itemActions {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.itemPrice {
+    margin: 0;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.removeButton {
+    background-color: transparent;
+    color: var(--text-muted);
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.25rem;
+}
+
+.removeButton:hover {
+    color: #ff8a8a;
+}
+
+.footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--surface-border);
+    background-color: var(--surface-background);
+    flex-shrink: 0;
+}
+
+.totalSection {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.checkoutButton {
+    width: 100%;
+    padding: 0.9rem;
+    font-size: 1rem;
+    font-weight: bold;
+}

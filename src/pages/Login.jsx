@@ -1,9 +1,10 @@
 // src/pages/Login.jsx
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-import styles from './AuthForm.module.css'; // Import the CSS Module
+import styles from './AuthForm.module.css';
+import ThemeToggle from '../components/ThemeToggle.jsx';
 
 function Login() {
     const [step, setStep] = useState(0);
@@ -11,6 +12,21 @@ function Login() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+
+    // --- Add state for theme and password visibility ---
+    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
+    const [showPassword, setShowPassword] = useState(false);
+
+    // --- Add theme logic ---
+    const toggleTheme = () => {
+        const newTheme = theme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+    };
+
+    useEffect(() => {
+        document.body.setAttribute('data-theme', theme);
+    }, [theme]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -45,6 +61,9 @@ function Login() {
     return (
         <div className={styles.formContainer}>
             <div className={styles.formCard}>
+                <div className={styles.themeToggleContainer}>
+                    <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
+                </div>
                 <h2>Login</h2>
                 <form onSubmit={handleLogin}>
                     {step === 0 && (
@@ -63,13 +82,21 @@ function Login() {
                     {step === 1 && (
                         <div className={styles.formStep}>
                             <label>Password</label>
-                            <input
-                                type="password"
-                                placeholder="Enter password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                autoFocus
-                            />
+                            <div className={styles.passwordWrapper}>
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    placeholder="Enter password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    autoFocus
+                                />
+                                <span
+                                    className={styles.passwordIcon}
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? '👁️' : '🙈'}
+                                </span>
+                            </div>
                         </div>
                     )}
 
