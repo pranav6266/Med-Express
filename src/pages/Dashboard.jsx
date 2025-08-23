@@ -5,18 +5,27 @@ import axios from 'axios';
 import Header from '../components/Header.jsx';
 import { useCart } from "../context/CartContext.jsx";
 
+const categories = ["All", "Pain Relief", "Allergy", "Vitamins", "Digestive Health", "First Aid"];
+const medicineKeywords = {
+    "Pain Relief": ["Paracetamol", "Ibuprofen", "Aspirin", "Tylenol", "Advil", "Aleve", "Excedrin", "Midol"],
+    "Allergy": ["Loratadine", "Cetirizine", "Antihistamine", "Benadryl", "Zyrtec", "Claritin"],
+    "Vitamins": ["Multivitamin", "Vitamin D3", "Calcium", "Iron Supplement"],
+    "Digestive Health": ["Omeprazole", "Antacid", "Gaviscon", "Pepto-Bismol", "Imodium", "Probiotic"],
+    "First Aid": ["Band-Aids", "Hydrogen Peroxide", "Neosporin", "Cortizone-10"]
+};
+
 function Dashboard() {
-    // Local state for this component
-    const [medicines, setMedicines] = useState([]);
-    const [stores, setStores] = useState([]); // State to hold the list of stores
-    const [loading, setLoading] = useState(true);
+    const [allMedicines, setAllMedicines] = useState([]);
+    const [filteredMedicines, setFilteredMedicines] = useState([]);
+    const [stores, setStores] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
-
-    // Global state from CartContext
+    const [activeCategory, setActiveCategory] = useState('All');
+    const [hoveredCard, setHoveredCard] = useState(null); // State to track hovered card
     const { addToCart, selectedStore, setSelectedStore } = useCart();
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
-    // Effect to fetch all available stores when the component mounts
     useEffect(() => {
         const fetchStores = async () => {
             try {
@@ -29,21 +38,18 @@ function Dashboard() {
         fetchStores();
     }, []);
 
-    // Effect to fetch medicines whenever a store is selected or the search term changes
     useEffect(() => {
-        // Only fetch medicines if a store has been selected
         if (!selectedStore) {
-            setMedicines([]); // Clear medicines if no store is selected
-            setLoading(false);
+            setAllMedicines([]);
+            setFilteredMedicines([]);
             return;
         }
 
         const fetchMedicines = async () => {
             try {
                 setLoading(true);
-                // Updated API call to fetch medicines for the specific store
                 const { data } = await axios.get(`/api/users/medicines?storeId=${selectedStore}`);
-                setMedicines(data);
+                setAllMedicines(data);
                 setError('');
             } catch (err) {
                 const message = err.response?.data?.message || 'Failed to fetch medicines';
@@ -54,7 +60,27 @@ function Dashboard() {
         };
 
         fetchMedicines();
-    }, [selectedStore, searchTerm]); // Re-run this effect when selectedStore or searchTerm changes
+    }, [selectedStore]);
+
+    useEffect(() => {
+        let medicinesToFilter = [...allMedicines];
+
+        if (activeCategory !== 'All') {
+            const keywords = medicineKeywords[activeCategory];
+            medicinesToFilter = medicinesToFilter.filter(med =>
+                keywords.some(keyword => med.name.includes(keyword) || med.description.includes(keyword))
+            );
+        }
+
+        if (searchTerm) {
+            medicinesToFilter = medicinesToFilter.filter(med =>
+                med.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        setFilteredMedicines(medicinesToFilter);
+    }, [searchTerm, activeCategory, allMedicines]);
+
 
     const handleAddToCart = (med) => {
         if (med.stock > 0) {
@@ -62,66 +88,92 @@ function Dashboard() {
         }
     };
 
-    // Handler for the dropdown selection
-    const handleStoreChange = (e) => {
-        setSelectedStore(e.target.value);
-    };
+    const selectedStoreDetails = stores.find(s => s._id === selectedStore);
 
     return (
         <div>
             <Header />
             <div style={styles.container}>
-                <h1 style={styles.title}>Our Medicines</h1>
+                <div style={styles.heroSection}>
+                    <h1 style={styles.title}>Welcome back, {userInfo?.name}!</h1>
+                    <p style={styles.subtitle}>Your health is our priority. Get your medicines delivered fast.</p>
+                </div>
 
-                {/* Store Selection Dropdown */}
-                <select onChange={handleStoreChange} value={selectedStore || ''} style={styles.storeSelector}>
-                    <option value="" disabled>-- Select a Pharmacy --</option>
-                    {stores.map(store => (
-                        <option key={store._id} value={store._id}>
-                            {store.name} - {store.address}
-                        </option>
-                    ))}
-                </select>
-
-                {/* Search input is disabled until a store is selected */}
-                <input
-                    type="text"
-                    placeholder="Search for medicines..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    style={styles.searchInput}
-                    disabled={!selectedStore}
-                />
-
-                {/* Conditional Rendering Logic */}
-                {loading ? (
-                    <p>Loading...</p>
-                ) : error ? (
-                    <p style={styles.errorMessage}>{error}</p>
-                ) : !selectedStore ? (
-                    <p style={styles.prompt}>Please select a store to view available medicines.</p>
-                ) : medicines.length === 0 ? (
-                    <p style={styles.prompt}>No medicines found at this store.</p>
+                {!selectedStore ? (
+                    <div style={styles.storeSelectorPrompt}>
+                        <h2>Select a Pharmacy to Start Shopping</h2>
+                        <select onChange={(e) => setSelectedStore(e.target.value)} defaultValue="" style={styles.storeSelector}>
+                            <option value="" disabled>-- Click to choose a nearby pharmacy --</option>
+                            {stores.map(store => (
+                                <option key={store._id} value={store._id}>
+                                    {store.name} - {store.address}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 ) : (
-                    <div style={styles.grid}>
-                        {medicines.map((med) => (
-                            <div key={med._id} style={styles.card}>
-                                <img src={med.imageUrl} alt={med.name} style={styles.medImage} />
-                                <h3 style={styles.medName}>{med.name}</h3>
-                                <p style={styles.medDescription}>{med.description}</p>
-                                <p style={styles.medPrice}>${med.price.toFixed(2)}</p>
-                                <p style={styles.medStock}>
-                                    {med.stock > 0 ? `In Stock: ${med.stock}` : 'Out of Stock'}
-                                </p>
+                    <div>
+                        <div style={styles.controlsContainer}>
+                        <div style={styles.storeDisplay}>
+                            <span>Shopping from: <strong>{selectedStoreDetails?.name}</strong></span>
+                            <button onClick={() => setSelectedStore(null)} style={styles.changeStoreButton}>Change Store</button>
+                        </div>
+
+                        <input
+                            type="text"
+                            placeholder="Search for medicines..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            style={styles.searchInput}
+                        />
+                        </div>
+                        <div style={styles.categoryTabs}>
+                            {categories.map(category => (
                                 <button
-                                    style={styles.button}
-                                    disabled={med.stock === 0}
-                                    onClick={() => handleAddToCart(med)}
+                                    key={category}
+                                    style={activeCategory === category ? styles.activeTab : styles.tab}
+                                    onClick={() => setActiveCategory(category)}
                                 >
-                                    {med.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
+                                    {category}
                                 </button>
+                            ))}
+                        </div>
+
+                        {loading ? (
+                            <p style={styles.prompt}>Loading Medicines...</p>
+                        ) : error ? (
+                            <p style={styles.errorMessage}>{error}</p>
+                        ) : filteredMedicines.length === 0 ? (
+                            <p style={styles.prompt}>No medicines found for "{activeCategory}"{searchTerm && ` matching "${searchTerm}"`}.</p>
+                        ) : (
+                            <div style={styles.grid}>
+                                {filteredMedicines.map((med) => (
+                                    <div
+                                        key={med._id}
+                                        style={hoveredCard === med._id ? {...styles.card, ...styles.cardHover} : styles.card}
+                                        onMouseEnter={() => setHoveredCard(med._id)}
+                                        onMouseLeave={() => setHoveredCard(null)}
+                                    >
+                                        {med.stock === 0 && <div style={styles.outOfStockOverlay}>Out of Stock</div>}
+                                        <img src={med.imageUrl} alt={med.name} style={styles.medImage} />
+                                        <div style={styles.cardContent}>
+                                            <h3 style={styles.medName}>{med.name}</h3>
+                                            <p style={styles.medDescription}>{med.description}</p>
+                                            <div style={styles.cardFooter}>
+                                                <p style={styles.medPrice}>${med.price.toFixed(2)}</p>
+                                                <button
+                                                    style={styles.button}
+                                                    disabled={med.stock === 0}
+                                                    onClick={() => handleAddToCart(med)}
+                                                >
+                                                    Add to Cart
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        )}
                     </div>
                 )}
             </div>
@@ -129,61 +181,127 @@ function Dashboard() {
     );
 }
 
-// Styling (with new styles added)
+// --- REFINED STYLES ---
 const styles = {
-    container: { padding: '0 2rem' },
-    title: { textAlign: 'center', marginBottom: '1rem' },
+    container: { padding: '2rem' },
+    heroSection: { textAlign: 'center', marginBottom: '2rem' },
+    title: { margin: '0 0 0.5rem 0' },
+    subtitle: { margin: 0, fontSize: '1.2rem', color: '#aaa' },
+    storeSelectorPrompt: {
+        backgroundColor: 'var(--card-background)',
+        padding: '3rem 2rem',
+        borderRadius: '16px',
+        textAlign: 'center',
+        border: '1px solid var(--card-border)'
+    },
     storeSelector: {
         width: '100%',
+        maxWidth: '600px',
         padding: '0.75rem',
-        marginBottom: '1rem',
+        marginTop: '1.5rem',
         borderRadius: '8px',
         border: '1px solid var(--input-border)',
         backgroundColor: 'var(--input-background)',
         color: 'var(--text-color)',
         fontSize: '1rem',
+    },
+    storeDisplay: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '1rem',
+        marginBottom: '1rem',
+        padding: '0.75rem',
+        backgroundColor: 'var(--input-background)',
+        borderRadius: '8px',
+    },
+    changeStoreButton: {
+        background: 'transparent',
+        border: '1px solid var(--primary-color)',
+        color: 'var(--primary-color)',
+        padding: '0.25rem 0.75rem',
+        borderRadius: '4px',
+        cursor: 'pointer'
     },
     searchInput: {
         width: '100%',
-        padding: '0.75rem',
-        marginBottom: '2rem',
+        padding: '0.85rem',
+        marginBottom: '1.5rem',
         borderRadius: '8px',
         border: '1px solid var(--input-border)',
         backgroundColor: 'var(--input-background)',
         color: 'var(--text-color)',
         fontSize: '1rem',
+        boxSizing: 'border-box',
     },
-    prompt: {
-        textAlign: 'center',
-        fontSize: '1.2rem',
-        color: '#aaa',
-        padding: '2rem',
+    categoryTabs: {
+        display: 'flex',
+        gap: '0.5rem',
+        marginBottom: '2rem',
+        flexWrap: 'wrap',
     },
-    grid: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-        gap: '1.5rem',
+    tab: {
+        padding: '0.5rem 1.25rem',
+        cursor: 'pointer',
+        borderRadius: '20px',
+        border: '1px solid var(--card-border)',
+        background: 'transparent',
+        color: 'var(--text-color)',
+        fontSize: '0.9rem'
     },
+    activeTab: {
+        padding: '0.5rem 1.25rem',
+        cursor: 'pointer',
+        borderRadius: '20px',
+        border: '1px solid var(--primary-color)',
+        background: 'var(--primary-color)',
+        color: 'white',
+        fontSize: '0.9rem'
+    },
+    prompt: { textAlign: 'center', fontSize: '1.2rem', color: '#aaa', padding: '2rem' },
+    grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1.5rem' },
     card: {
         backgroundColor: 'var(--card-background)',
-        padding: '1.5rem',
         borderRadius: '12px',
         border: '1px solid var(--card-border)',
         display: 'flex',
         flexDirection: 'column',
+        overflow: 'hidden',
+        position: 'relative',
+        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+    },
+    cardHover: {
+        transform: 'translateY(-5px)',
+        boxShadow: '0 8px 20px var(--glow-color)',
+    },
+    outOfStockOverlay: {
+        position: 'absolute',
+        top: '10px',
+        right: '10px',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        color: '#ffc107',
+        padding: '0.25rem 0.75rem',
+        borderRadius: '12px',
+        fontSize: '0.8rem',
+        fontWeight: 'bold',
+        zIndex: 2
     },
     medImage: {
         width: '100%',
-        height: '150px',
+        height: '160px',
         objectFit: 'cover',
-        borderRadius: '8px',
-        marginBottom: '1rem',
+        borderBottom: '1px solid var(--card-border)',
     },
-    medName: { marginTop: 0, flexGrow: 1 },
-    medDescription: { color: '#ccc', flexGrow: 1 },
-    medPrice: { fontWeight: 'bold', fontSize: '1.2rem' },
-    medStock: { color: '#aaa' },
-    button: { width: '100%', padding: '0.75rem', marginTop: 'auto' },
+    controlsContainer: {
+        maxWidth: '800px',
+        margin: '0 auto 2rem auto',
+    },
+    cardContent: { padding: '1rem', display: 'flex', flexDirection: 'column', flexGrow: 1 },
+    medName: { marginTop: 0, marginBottom: '0.5rem', fontSize: '1.1rem' },
+    medDescription: { color: '#ccc', flexGrow: 1, fontSize: '0.9rem', marginBottom: '1rem' },
+    cardFooter: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' },
+    medPrice: { fontWeight: 'bold', fontSize: '1.3rem', margin: 0 },
+    button: { padding: '0.6rem 1rem', fontSize: '0.9rem' },
     errorMessage: { color: '#ff6b6b', textAlign: 'center' },
 };
 

@@ -1,11 +1,12 @@
 // src/components/Header.jsx
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
 
 function Header() {
     const navigate = useNavigate();
+    const location = useLocation(); // Hook to check the current page
     const { toggleCart, cartItems } = useCart();
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
@@ -29,115 +30,185 @@ function Header() {
         };
     }, []);
 
-    const handleCartClick = () => {
-        toggleCart();
-        setIsDropdownOpen(false);
+    const getLinkStyle = (path) => {
+        return location.pathname === path ? { ...styles.navLink, ...styles.activeNavLink } : styles.navLink;
     };
 
     return (
         <header style={styles.header}>
-            <div style={styles.logo}>
-                <Link to={userInfo ? (userInfo.role === 'user' ? '/dashboard' : `/${userInfo.role}/dashboard`) : '/login'} style={styles.link}>
-                    MedExpress
-                </Link>
+            <div style={styles.headerLeft}>
+                <div style={styles.logoContainer}>
+                    <Link to="/dashboard" style={styles.logo}>MedExpress</Link>
+                    <span style={styles.tagline}>Your Health, Delivered Fast</span>
+                </div>
+                <nav style={styles.navigation}>
+                    <Link to="/dashboard" style={getLinkStyle('/dashboard')}>Shop</Link>
+                    <Link to="/orders" style={getLinkStyle('/orders')}>My Orders</Link>
+                </nav>
             </div>
 
-            <div style={styles.userSection}>
+            <div style={styles.headerRight}>
                 {userInfo && (
-                    <div style={styles.profileContainer} ref={dropdownRef}>
-                        <img
-                            src={userInfo.avatar}
-                            alt="Profile"
-                            style={styles.avatar}
-                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        />
+                    <>
+                        <div onClick={toggleCart} style={styles.cartIconContainer}>
+                            <span>🛒</span>
+                            {cartItems.length > 0 && (
+                                <span style={styles.cartBadge}>{cartItems.length}</span>
+                            )}
+                        </div>
 
-                        {isDropdownOpen && (
-                            <div style={styles.dropdownMenu}>
-                                {/* --- REORDERED and RESTYLED Items --- */}
-                                <Link to="/profile" style={styles.dropdownLink} onClick={() => setIsDropdownOpen(false)}>
-                                    My Profile
-                                </Link>
+                        <div style={styles.profileContainer} ref={dropdownRef}>
+                            <img
+                                src={userInfo.avatar}
+                                alt="Profile"
+                                style={styles.avatar}
+                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            />
 
-                                {userInfo.role === 'user' && (
-                                    <button onClick={handleCartClick} style={styles.dropdownLink}>
-                                        <div style={styles.dropdownCartItem}>
-                                            <span>My Cart</span>
-                                            {cartItems.length > 0 && (
-                                                <span style={styles.cartBadge}>{cartItems.length}</span>
-                                            )}
-                                        </div>
+                            {isDropdownOpen && (
+                                <div style={styles.dropdownMenu}>
+                                    <div style={styles.dropdownHeader}>
+                                        Signed in as<br /><strong>{userInfo.name}</strong>
+                                    </div>
+                                    <Link to="/profile" style={styles.dropdownLink} onClick={() => setIsDropdownOpen(false)}>
+                                        👤 My Profile
+                                    </Link>
+                                    <div style={styles.dropdownDivider}></div>
+                                    <button onClick={handleLogout} style={{ ...styles.dropdownLink, ...styles.logoutButton }}>
+                                        🚪 Logout
                                     </button>
-                                )}
-
-                                <Link to="/orders" style={styles.dropdownLink} onClick={() => setIsDropdownOpen(false)}>
-                                    My Orders
-                                </Link>
-
-                                <button onClick={handleLogout} style={styles.dropdownLink}>
-                                    Logout
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </>
                 )}
             </div>
         </header>
     );
 }
 
+// --- REFINED STYLES ---
 const styles = {
     header: {
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '1rem 2rem', backgroundColor: 'var(--card-background)',
-        color: 'var(--text-color)', borderBottom: '1px solid var(--card-border)',
-        marginBottom: '2rem',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '0.75rem 2rem',
+        backgroundColor: 'var(--card-background)',
+        color: 'var(--text-color)',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100
     },
-    logo: { fontSize: '1.5rem', fontWeight: 'bold' },
-    link: { color: 'var(--text-color)', textDecoration: 'none' },
-    userSection: { display: 'flex', alignItems: 'center', gap: '1.5rem' },
+    headerLeft: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '2.5rem'
+    },
+    logoContainer: {
+        display: 'flex',
+        flexDirection: 'column'
+    },
+    logo: {
+        fontSize: '1.7rem',
+        fontWeight: 'bold',
+        textDecoration: 'none',
+        color: 'var(--text-color)'
+    },
+    tagline: {
+        fontSize: '0.75rem',
+        color: '#ccc',
+        marginTop: '-5px'
+    },
+    navigation: {
+        display: 'flex',
+        gap: '2rem'
+    },
+    navLink: {
+        textDecoration: 'none',
+        color: 'var(--text-color)',
+        fontSize: '1rem',
+        padding: '0.5rem 0',
+        borderBottom: '2px solid transparent',
+        transition: 'border-color 0.3s, color 0.3s'
+    },
+    activeNavLink: {
+        color: 'var(--primary-color)',
+        borderBottom: '2px solid var(--primary-color)'
+    },
+    headerRight: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1.5rem'
+    },
+    cartIconContainer: {
+        position: 'relative',
+        cursor: 'pointer',
+        fontSize: '1.5rem',
+    },
+    cartBadge: {
+        position: 'absolute',
+        top: '-5px',
+        right: '-10px',
+        background: 'var(--glow-color)',
+        color: 'white',
+        borderRadius: '50%',
+        padding: '0.1rem 0.4rem',
+        fontSize: '0.75rem',
+        fontWeight: 'bold'
+    },
     profileContainer: { position: 'relative' },
     avatar: {
-        width: '45px', height: '45px', borderRadius: '50%',
-        cursor: 'pointer', border: '2px solid var(--primary-color)', objectFit: 'cover'
+        width: '45px',
+        height: '45px',
+        borderRadius: '50%',
+        cursor: 'pointer',
+        border: '2px solid var(--primary-color)',
+        objectFit: 'cover'
     },
     dropdownMenu: {
-        position: 'absolute', top: '60px', right: '0',
-        backgroundColor: 'var(--card-background)',
+        position: 'absolute',
+        top: '60px',
+        right: '0',
+        backgroundColor: 'var(--background-start)',
         border: '1px solid var(--card-border)',
-        borderRadius: '8px',
+        borderRadius: '12px',
         padding: '0.5rem',
         zIndex: 20,
-        width: '180px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+        width: '220px',
+        boxShadow: '0 8px 16px rgba(0,0,0,0.3)',
     },
-    // --- NEW UNIFIED STYLE for all dropdown items (links and buttons) ---
+    dropdownHeader: {
+        padding: '0.75rem 1rem',
+        borderBottom: '1px solid var(--card-border)',
+        marginBottom: '0.5rem',
+        color: '#aaa',
+        fontSize: '0.9rem'
+    },
     dropdownLink: {
-        display: 'flex', // Use flex for alignment
-        alignItems: 'center', // Center content vertically
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem',
         width: '100%',
         padding: '0.75rem 1rem',
         color: 'var(--text-color)',
-        textAlign: 'left',
-        // Reset button/link specific styles
         background: 'none',
         border: 'none',
         cursor: 'pointer',
         fontSize: '1rem',
         textDecoration: 'none',
-        borderRadius: '4px',
+        borderRadius: '8px',
+        transition: 'background-color 0.2s'
     },
-    dropdownCartItem: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '100%',
+    dropdownDivider: {
+        height: '1px',
+        backgroundColor: 'var(--card-border)',
+        margin: '0.5rem 0'
     },
-    cartBadge: {
-        background: 'var(--glow-color)', color: 'white',
-        borderRadius: '10px', padding: '0.1rem 0.5rem',
-        fontSize: '0.75rem', fontWeight: 'bold',
-    },
+    logoutButton: {
+        color: '#ff8a8a'
+    }
 };
 
 export default Header;
