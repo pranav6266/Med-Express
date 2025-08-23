@@ -9,7 +9,7 @@ import {
     getCart,
     removeFromCart,
     updateCartItemQuantity,
-    getAllStores,
+    getAllStores, updateUserProfile, getUserProfile, changePassword,
 } from '../controllers/userController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
@@ -41,5 +41,12 @@ router.route('/cart/:medicineId')
     .delete(protect, authorize('user'), removeFromCart);
 
 router.get('/stores', getAllStores);
+
+// Route for getting and updating the user's own profile
+router.route('/profile')
+    .get(protect, getUserProfile)
+    .put(protect, updateUserProfile);
+
+router.put('/profile/changepassword', protect, changePassword);
 
 export default router;

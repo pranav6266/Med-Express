@@ -2,6 +2,18 @@
 
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+
+// --- NEW: A sub-schema for a structured address ---
+const addressSchema = new mongoose.Schema({
+    flatNo: { type: String, default: '' },
+    road: { type: String, default: '' },
+    locality: { type: String, default: '' },
+    pincode: { type: String, default: '' },
+    city: { type: String, default: 'Bangalore' },
+    state: { type: String, default: 'Karnataka' },
+}, { _id: false });
+
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -26,31 +38,31 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'agent', 'admin'],
         default: 'user',
     },
-    address: {
+    // --- UPDATED: Address is now a structured object ---
+    address: addressSchema,
+
+    // --- NEW: Fields for phone and avatar ---
+    phone: {
         type: String,
-        trim: true,
+        default: ''
+    },
+    avatar: {
+        type: String,
+        default: '../public/avatars/default_profile_img.png'
     },
     cart: [
         {
-            medicine: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Medicine',
-                required: true,
-            },
-            quantity: {
-                type: Number,
-                required: true,
-                default: 1,
-            },
+            medicine: { type: mongoose.Schema.Types.ObjectId, ref: 'Medicine', required: true },
+            quantity: { type: Number, required: true, default: 1 },
         },
     ],
-},
-
-    {
-    timestamps: true // Adds createdAt and updatedAt timestamps
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
+}, {
+    timestamps: true
 });
 
-// Password hashing middleware before saving a user
+
 userSchema.pre('save', async function(next) {
     if (!this.isModified('password')) {
         return next();
@@ -60,28 +72,20 @@ userSchema.pre('save', async function(next) {
     next();
 });
 
-// Method to compare entered password with hashed password
 userSchema.methods.matchPassword = async function(enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
 userSchema.methods.getResetPasswordToken = function () {
-    // Generate token
     const resetToken = crypto.randomBytes(20).toString('hex');
-
-    // Hash token and set to resetPasswordToken field
     this.resetPasswordToken = crypto
         .createHash('sha256')
         .update(resetToken)
         .digest('hex');
-
-    // Set expire time (e.g., 10 minutes)
     this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
-
-    return resetToken; // Return the unhashed token to be sent in the email
+    return resetToken;
 };
 
 
 const User = mongoose.model('User', userSchema);
-
 export default User;

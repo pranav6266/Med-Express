@@ -17,6 +17,7 @@ import ThemeToggle from './components/ThemeToggle';
 import ProtectedRoute from './components/ProtectedRoute';
 import AgentRoute from './components/AgentRoute';
 import AdminRoute from './components/AdminRoute';
+import Profile from './pages/Profile.jsx';
 
 import './App.css';
 
@@ -56,6 +57,7 @@ function AppContent() {
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/orders" element={<OrderHistory />} />
                         <Route path="/checkout" element={<Checkout />} />
+                        <Route path="/profile" element={<Profile />} />
                     </Route>
 
                     {/* Protected Agent Routes */}

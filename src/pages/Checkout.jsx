@@ -9,36 +9,49 @@ import Header from '../components/Header.jsx';
 function Checkout() {
     const { cartItems, fetchCart, selectedStore } = useCart();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
 
-    const [formData, setFormData] = useState({
-        name: '',
-        phone: '',
-        address: {
-            flatNo: '',
-            road: '',
-            locality: '',
-            pincode: '',
-            landmark: '',
-            city: 'Bangalore',
-            state: 'Karnataka',
-        }
-    });
+    // --- REFACTORED STATE ---
+    const [view, setView] = useState('LOADING');
+    const [savedAddress, setSavedAddress] = useState(null);
+    const [formData, setFormData] = useState({name: '', phone: '', address: { flatNo: '', road: '', locality: '', pincode: '', landmark: '', city: 'Bangalore', state: 'Karnataka' }});
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-        if (userInfo) {
-            setFormData(prevData => ({
-                ...prevData,
-                name: userInfo.name || '',
-            }));
-        }
+        const loadAddress = async () => {
+            // Priority 1: Check for a 'lastUsedAddress' in localStorage
+            const lastUsedAddress = JSON.parse(localStorage.getItem('lastUsedAddress'));
+            if (lastUsedAddress) {
+                setSavedAddress(lastUsedAddress);
+                setView('CONFIRM_ADDRESS');
+                return;
+            }
 
-        if (!selectedStore) {
-            navigate('/dashboard');
-        }
-    }, [selectedStore, navigate]);
+            // Priority 2: Fetch the user's profile for their default address
+            try {
+                const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+                const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+                const { data: profile } = await axios.get('/api/users/profile', config);
+
+                if (profile.address && profile.address.locality) {
+                    setSavedAddress(profile.address);
+                    setView('CONFIRM_ADDRESS');
+                } else {
+                    // If no address is found anywhere, go directly to the edit form
+                    setView('EDIT_ADDRESS');
+                }
+
+                // Pre-fill user contact info regardless
+                setFormData(prev => ({ ...prev, name: profile.name, phone: profile.phone }));
+
+            } catch (err) {
+                // If fetching fails, go to edit form
+                setView('EDIT_ADDRESS');
+            }
+        };
+
+        loadAddress();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -89,6 +102,7 @@ function Checkout() {
                 orderItems, deliveryAddress: formattedAddress, totalAmount, fulfillmentStore: selectedStore,
             }, config);
 
+            localStorage.setItem('lastUsedAddress', JSON.stringify(addressToUse));
             await fetchCart();
             navigate('/orders');
 

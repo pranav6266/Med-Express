@@ -300,3 +300,92 @@ export const getAllStores = async (req, res, next) => {
         next(error);
     }
 };
+
+// Add these to controllers/userController.js
+
+/**
+ * @desc    Get user profile
+ * @route   GET /api/users/profile
+ * @access  Private
+ */
+export const getUserProfile = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (user) {
+            res.json(user);
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @desc    Update user profile
+ * @route   PUT /api/users/profile
+ * @access  Private
+ */
+export const updateUserProfile = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id);
+
+        if (user) {
+            user.name = req.body.name || user.name;
+            user.phone = req.body.phone || user.phone;
+            user.avatar = req.body.avatar || user.avatar;
+
+            // Handle nested address object
+            if (req.body.address) {
+                user.address = { ...user.address, ...req.body.address };
+            }
+
+            const updatedUser = await user.save();
+
+            res.json({
+                _id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                role: updatedUser.role,
+                avatar: updatedUser.avatar,
+                // token is not re-issued here, but could be if needed
+            });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Add this new function to controllers/userController.js
+
+/**
+ * @desc    Change user password
+ * @route   PUT /api/users/profile/changepassword
+ * @access  Private
+ */
+export const changePassword = async (req, res, next) => {
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+        return res.status(400).json({ message: 'Please provide both old and new passwords.' });
+    }
+
+    try {
+        const user = await User.findById(req.user.id);
+
+        // Check if user is found and if the old password matches
+        if (user && (await user.matchPassword(oldPassword))) {
+            // Set the new password. The pre-save hook in the model will hash it.
+            user.password = newPassword;
+            await user.save();
+            res.json({ message: 'Password updated successfully' });
+        } else {
+            // If the old password does not match, return an error
+            res.status(401).json({ message: 'Invalid old password' });
+        }
+    } catch (error) {
+        next(error);
+    }
+};
