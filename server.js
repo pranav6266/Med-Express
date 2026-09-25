@@ -49,7 +49,8 @@ if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, 'dist')));
 
     // 2. For any other route, serve the index.html file
-    app.get('*', (req, res) => {
+    // Express 5 needs a named wildcard for the SPA fallback
+    app.get('/{*splat}', (req, res) => {
         res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
     });
 } else {

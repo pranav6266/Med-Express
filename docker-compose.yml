@@ -1,0 +1,54 @@
+name: medexpress
+
+services:
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      retries: 20
+    restart: unless-stopped
+
+  # One-shot: loads the demo users, stores and medicines the first time
+  seed:
+    build:
+      context: .
+      network: ${BUILD_NETWORK:-default}
+    image: medexpress-app
+    environment:
+      MONGO_URI: mongodb://mongo:27017/medExpress
+    command:
+      - sh
+      - -c
+      - >
+        node -e "import('mongoose').then(async ({default: m}) => { await m.connect(process.env.MONGO_URI);
+        const n = await m.connection.db.collection('users').countDocuments(); process.exit(n ? 0 : 1); })"
+        && echo 'Already seeded' || node seeder.js
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: "no"
+
+  app:
+    build:
+      context: .
+      network: ${BUILD_NETWORK:-default}
+    image: medexpress-app
+    environment:
+      MONGO_URI: mongodb://mongo:27017/medExpress
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env (see .env.example)}
+      JWT_EXPIRE: ${JWT_EXPIRE:-30d}
+    volumes:
+      - uploads:/app/uploads
+    ports:
+      - "${APP_PORT:-3007}:5000"
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
+  uploads:

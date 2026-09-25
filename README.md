@@ -93,6 +93,17 @@ It seamlessly connects **Users**, **Agents**, and **Admins** into one integrated
 
 ---
 
+## 🐳 Run with Docker
+
+Runs MongoDB, loads the demo data once, and serves the built React app and API from one container.
+
+```bash
+cp .env.example .env   # set JWT_SECRET, e.g. openssl rand -base64 32
+docker compose up -d --build --wait
+```
+
+Open http://localhost:3007 and sign in with one of the dummy accounts below.
+
 ## ⚡ Installation & Setup
 
 ```bash
